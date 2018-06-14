@@ -21,6 +21,7 @@ df = df.withColumn('Tags', regexp_replace('Tags', '  ', ' '))
 # calculate weight
 # 
 df = df.withColumn('total', df['AnswerCount']+df['CommentCount']+df['FavoriteCount'])
+df = sc.parallelize(df)
 
 
 def get_v(xx):
