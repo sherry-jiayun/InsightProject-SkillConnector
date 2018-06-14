@@ -46,6 +46,6 @@ for x in df.collect():
 				cypher = ""
 				cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
 				cypher += "MERGE (v1)-[r:Group { weight: 0 }]->(v2) " # create relationship
-				cypher += "WITH r " # update relationship
-				cypher += "SET r.weight = r.weight + "+str(x[4])
+				# cypher += "WITH r " # update relationship
+				# cypher += "SET r.weight = r.weight + "+str(x[4])
 				session.run(cypher)
