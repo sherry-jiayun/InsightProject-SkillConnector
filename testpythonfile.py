@@ -3,10 +3,7 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
-# hardcode
-master = 'spark://52.86.128.53:7077'
 sc = SparkContext(master="spark://10.0.0.13:7077")
-sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
 # connect to neo4j
