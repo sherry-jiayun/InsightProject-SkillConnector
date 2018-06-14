@@ -3,7 +3,8 @@ from pyspark import SparkContext
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
-sc = SparkContext("local", "Simple App")
+conf = SparkConf().setAppName("paralleltast").setMaster(master)
+sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
 # connect to neo4j
@@ -21,8 +22,6 @@ df = df.withColumn('Tags', regexp_replace('Tags', '  ', ' '))
 # calculate weight
 # 
 df = df.withColumn('total', df['AnswerCount']+df['CommentCount']+df['FavoriteCount'])
-df = sc.parallelize(df)
-
 
 def get_v(xx):
 	xx_v = ''
@@ -36,9 +35,7 @@ def get_v(xx):
 # create vertex and edge 
 # MERGE (:Vertex { Name : "C++" }) MERGE (:Vertex { Name : "winform" }) 
 # MERGE (v1:Vertex {Name:'C#'})-[r:Group]->(v2:Vertex {Name:'C++'})
-print()
 print("++++++++++++++start to do insert++++++++++++++")
-print()
 check_list = list()
 for x in df.collect():
 	vertex_list = x[3].strip().split(' ')
