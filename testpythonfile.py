@@ -12,7 +12,7 @@ driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
 session = driver.session()
 
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM posts WHERE Tags IS NOT NULL LIMIT 100) tmp",user="sherry_jiayun",password="yjy05050609").load()
+df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM posts WHERE Tags IS NOT NULL LIMIT 10000) tmp",user="sherry_jiayun",password="yjy05050609").load()
 # replace < > and.  
 df = df.withColumn('Tags', regexp_replace('Tags', '<', ' '))
 df = df.withColumn('Tags', regexp_replace('Tags', '>', ' '))
@@ -48,6 +48,6 @@ for x in df.collect():
 				cypher = ""
 				cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
 				cypher += "MERGE (v1)-[r:Group { weight: 0 }]->(v2) " # create relationship
-				# cypher += "WITH r " # update relationship
-				# cypher += "SET r.weight = r.weight + "+str(x[4])
+				cypher += "WITH r " # update relationship
+				cypher += "SET r.weight = r.weight + "+str(x[4])
 				session.run(cypher)
