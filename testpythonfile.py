@@ -1,5 +1,5 @@
 from pyspark.sql import SQLContext
-from pyspark import SparkContext
+from pyspark import SparkContext,parkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
