@@ -3,6 +3,7 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
+# hardcode
 sc = SparkContext(master="spark://10.0.0.13:7077")
 sqlContext = SQLContext(sc)
 
@@ -30,7 +31,13 @@ def get_v(xx):
 		else:
 			xx_v += '_'
 	return xx_v
-def insertToNeo4j(x):
+	
+# create vertex and edge 
+# MERGE (:Vertex { Name : "C++" }) MERGE (:Vertex { Name : "winform" }) 
+# MERGE (v1:Vertex {Name:'C#'})-[r:Group]->(v2:Vertex {Name:'C++'})
+print("++++++++++++++start to do insert++++++++++++++")
+check_list = list()
+for x in df.collect():
 	vertex_list = x[3].strip().split(' ')
 	for xx in vertex_list:
 		for xxx in vertex_list:
@@ -46,11 +53,4 @@ def insertToNeo4j(x):
 				cypher += "WITH r " # update relationship
 				cypher += "SET r.weight = r.weight + "+str(x[4])
 				session.run(cypher)
-# create vertex and edge 
-# MERGE (:Vertex { Name : "C++" }) MERGE (:Vertex { Name : "winform" }) 
-# MERGE (v1:Vertex {Name:'C#'})-[r:Group]->(v2:Vertex {Name:'C++'})
-print("++++++++++++++start to do insert++++++++++++++")
-check_list = list()
-df.foreach(insertToNeo4j)
-df.collect()
 	
