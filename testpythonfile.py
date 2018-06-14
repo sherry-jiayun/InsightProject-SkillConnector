@@ -3,7 +3,9 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
-conf = SparkConf().setAppName("paralleltast").setMaster(master)
+# hardcode
+master = 'spark://52.86.128.53:7077'
+conf = SparkConf().setAppName('paralleltast').setMaster(master)
 sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
