@@ -5,7 +5,7 @@ from pyspark.sql.functions import *
 
 # hardcode
 master = 'spark://52.86.128.53:7077'
-conf = SparkConf().setAppName('paralleltast').setMaster(master)
+conf = SparkConf().setAppName('paralleltast').setMaster("local")
 sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
