@@ -35,13 +35,13 @@ def get_v(xx):
 
 def writeToNeo4j(x):
 	vertex_list = x[3].strip().split(' ')
-	'''for xx in vertex_list:
+	for xx in vertex_list:
 		for xxx in vertex_list:
 			if not xxx == xx:
 				cypher = ""
 				cypher += "MERGE (:vertex{ name: '"+xx+"' }) " # create node 1 if not exist
 				cypher += "MERGE (:vertex{ name: '"+xxx+"'}) " # create node 2 if not exist
-				session.run(cypher)
+				# session.run(cypher)
 				cypher = ""
 				cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
 				cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
@@ -49,7 +49,7 @@ def writeToNeo4j(x):
 				cypher += "WITH r " # update relationship
 				cypher += "SET r.weight = r.weight + "+str(x[4])
 				#print (xx,xxx,x[4])
-				session.run(cypher)'''
+				# session.run(cypher)
 
 df.foreach(writeToNeo4j)
 
