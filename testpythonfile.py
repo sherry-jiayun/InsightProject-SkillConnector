@@ -9,9 +9,9 @@ sc = SparkContext(master="spark://10.0.0.13:7077")
 sqlContext = SQLContext(sc)
 
 # connect to neo4j
-uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
-driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
-session = driver.session()
+# uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
+# driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
+# session = driver.session()
 
 # get null null tags from 
 df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 10000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
@@ -34,6 +34,9 @@ def get_v(xx):
 	return xx_v
 
 def writeToNeo4j(x):
+	uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
+	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
+	session = driver.session()
 	vertex_list = x[3].strip().split(' ')
 	for xx in vertex_list:
 		for xxx in vertex_list:
@@ -50,6 +53,7 @@ def writeToNeo4j(x):
 				cypher += "SET r.weight = r.weight + "+str(x[4])
 				#print (xx,xxx,x[4])
 				# session.run(cypher)
+	session.close()
 
 df.foreach(writeToNeo4j)
 
