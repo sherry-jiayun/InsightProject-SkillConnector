@@ -2,6 +2,7 @@ from pyspark.sql import SQLContext
 from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
+from __future__ import print_function
 
 # hardcode
 sc = SparkContext(master="spark://10.0.0.13:7077")
@@ -13,7 +14,7 @@ driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
 session = driver.session()
 
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 1000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
+df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 10000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
 # replace < > and.  
 df = df.withColumn('Tags', regexp_replace('Tags', '<', ' '))
 df = df.withColumn('Tags', regexp_replace('Tags', '>', ' '))
@@ -31,7 +32,8 @@ def get_v(xx):
 		else:
 			xx_v += '_'
 	return xx_v
-	
+df.foreach(print)
+
 # create vertex and edge 
 # MERGE (:vertex{ name: '"+node_name_1+"'})
 # MERGE (:vertex{ name: '"+node_name_2+"'})
@@ -42,7 +44,7 @@ def get_v(xx):
 # WITH r 
 # SET r.weight = r.weight + str(new)
 print("++++++++++++++start to do insert++++++++++++++")
-check_list = list()
+'''check_list = list()
 for x in df.collect():
 	vertex_list = x[3].strip().split(' ')
 	for xx in vertex_list:
@@ -59,5 +61,5 @@ for x in df.collect():
 				cypher += "WITH r " # update relationship
 				cypher += "SET r.weight = r.weight + "+str(x[4])
 				print (xx,xxx,x[4])
-				session.run(cypher)
+				session.run(cypher)'''
 	
