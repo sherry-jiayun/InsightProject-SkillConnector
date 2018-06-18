@@ -13,7 +13,7 @@ driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
 session = driver.session()
 
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM posts WHERE Tags IS NOT NULL) tmp",user="sherry_jiayun",password="yjy05050609").load()
+df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM posts WHERE Tags IS NOT NULL LIMIT 1000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
 # replace < > and.  
 df = df.withColumn('Tags', regexp_replace('Tags', '<', ' '))
 df = df.withColumn('Tags', regexp_replace('Tags', '>', ' '))
