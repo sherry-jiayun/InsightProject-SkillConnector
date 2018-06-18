@@ -33,8 +33,14 @@ def get_v(xx):
 	return xx_v
 	
 # create vertex and edge 
-# MERGE (:Vertex { Name : "C++" }) MERGE (:Vertex { Name : "winform" }) 
-# MERGE (v1:Vertex {Name:'C#'})-[r:Group]->(v2:Vertex {Name:'C++'})
+# MERGE (:vertex{ name: '"+node_name_1+"'})
+# MERGE (:vertex{ name: '"+node_name_2+"'})
+# create edge
+# MATCH (v1:vertex {name:'"+node_name_1+"'}),(v2:vertex { name:'"+node_name_2+"'})
+# MERGE (v1)-[r:Group { name:'"+node_name_1+'-'+node_name_2+"'}]->(v2)
+# ON CREATE SET r.weight = 0 
+# WITH r 
+# SET r.weight = r.weight + str(new)
 print("++++++++++++++start to do insert++++++++++++++")
 check_list = list()
 for x in df.collect():
@@ -52,5 +58,6 @@ for x in df.collect():
 				cypher += "ON CREATE SET r.weight = 0 " # initialize weight
 				cypher += "WITH r " # update relationship
 				cypher += "SET r.weight = r.weight + "+str(x[4])
+				print (xx,xxx,x[4])
 				session.run(cypher)
 	
