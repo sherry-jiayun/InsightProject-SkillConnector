@@ -32,9 +32,10 @@ def get_v(xx):
 		else:
 			xx_v += '_'
 	return xx_v
+
 def writeToNeo4j(x):
 	vertex_list = x[3].strip().split(' ')
-	for xx in vertex_list:
+	'''for xx in vertex_list:
 		for xxx in vertex_list:
 			if not xxx == xx:
 				cypher = ""
@@ -48,7 +49,7 @@ def writeToNeo4j(x):
 				cypher += "WITH r " # update relationship
 				cypher += "SET r.weight = r.weight + "+str(x[4])
 				#print (xx,xxx,x[4])
-				session.run(cypher)
+				session.run(cypher)'''
 
 df.foreach(writeToNeo4j)
 
