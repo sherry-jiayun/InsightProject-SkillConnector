@@ -32,7 +32,25 @@ def get_v(xx):
 		else:
 			xx_v += '_'
 	return xx_v
-df.foreach(print)
+def writeToNeo4j(x):
+	vertex_list = x[3].strip().split(' ')
+	for xx in vertex_list:
+		for xxx in vertex_list:
+			if not xxx == xx:
+				cypher = ""
+				cypher += "MERGE (:vertex{ name: '"+xx+"' }) " # create node 1 if not exist
+				cypher += "MERGE (:vertex{ name: '"+xxx+"'}) " # create node 2 if not exist
+				session.run(cypher)
+				cypher = ""
+				cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
+				cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
+				cypher += "ON CREATE SET r.weight = 0 " # initialize weight
+				cypher += "WITH r " # update relationship
+				cypher += "SET r.weight = r.weight + "+str(x[4])
+				#print (xx,xxx,x[4])
+				session.run(cypher)
+
+df.foreach(writeToNeo4j)
 
 # create vertex and edge 
 # MERGE (:vertex{ name: '"+node_name_1+"'})
@@ -43,7 +61,6 @@ df.foreach(print)
 # ON CREATE SET r.weight = 0 
 # WITH r 
 # SET r.weight = r.weight + str(new)
-print("++++++++++++++start to do insert++++++++++++++")
 '''check_list = list()
 for x in df.collect():
 	vertex_list = x[3].strip().split(' ')
