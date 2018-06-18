@@ -1,8 +1,8 @@
+from __future__ import print_function
 from pyspark.sql import SQLContext
 from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
-from __future__ import print_function
 
 # hardcode
 sc = SparkContext(master="spark://10.0.0.13:7077")
