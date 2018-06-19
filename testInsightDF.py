@@ -6,7 +6,7 @@ from pyspark.sql.functions import *
 
 
 # hardcode
-sc = SparkContext(master="spark://10.0.0.13:7077")
+sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
 # connect to neo4j
