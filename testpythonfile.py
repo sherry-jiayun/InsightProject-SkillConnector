@@ -4,6 +4,7 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 
+
 # hardcode
 sc = SparkContext(master="spark://10.0.0.13:7077")
 sqlContext = SQLContext(sc)
@@ -14,7 +15,7 @@ sqlContext = SQLContext(sc)
 # session = driver.session()
 
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 100) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
+df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 10000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',4).load()
 # replace < > and for dataframe
 
 # df = df.withColumn('Tags', regexp_replace('Tags', '<', ' '))
@@ -50,6 +51,7 @@ rdd = sc.parallelize(df.collect())
 rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[0]+x[1]+x[2]))
 
 rdd_clean.foreachPartition(writeToNeo4j)
+rdd_clean.foreachPartition(writeToDF)
 # df.rdd.foreachPartition(f)
 
 # create vertex and edge 
