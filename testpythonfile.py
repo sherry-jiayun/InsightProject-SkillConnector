@@ -38,7 +38,7 @@ def writeToNeo4j(p):
 					cypher = ""
 					cypher += "MERGE (:vertex{ name: '"+xx+"' }) " # create node 1 if not exist
 					cypher += "MERGE (:vertex{ name: '"+xxx+"'}) " # create node 2 if not exist
-					print (cypher)
+					# print (cypher)
 					session.run(cypher)
 					cypher = ""
 					cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
@@ -46,7 +46,7 @@ def writeToNeo4j(p):
 					cypher += "ON CREATE SET r.weight = 0 " # initialize weight
 					cypher += "WITH r " # update relationship
 					cypher += "SET r.weight = r.weight + "+str(x[4])
-					#print (xx,xxx,x[4])
+					# print (xx,xxx,x[4])
 					session.run(cypher)
 	session.close()
 
