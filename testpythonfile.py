@@ -9,78 +9,118 @@ from pyspark.sql.functions import *
 sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
-# connect to neo4j
-# uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
-# driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
-# session = driver.session()
-
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",driver = "com.mysql.jdbc.Driver",dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags FROM Posts WHERE Tags IS NOT NULL LIMIT 1000) tmp",user="sherry_jiayun",password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',4).load()
-# replace < > and for dataframe
-
-# df = df.withColumn('Tags', regexp_replace('Tags', '<', ' '))
-# df = df.withColumn('Tags', regexp_replace('Tags', '>', ' '))
-# df = df.withColumn('Tags', regexp_replace('Tags', '  ', ' '))
-# df = df.withColumn('total', df['AnswerCount']+df['CommentCount']+df['FavoriteCount'])
-
+df = sqlContext.read.format("jdbc").options(
+	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	driver = "com.mysql.jdbc.Driver",
+	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts PARTITION (p0) WHERE Tags IS NOT NULL) tmp",
+	user="sherry_jiayun",
+	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
+df = sqlContext.read.format("jdbc").options(
+	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",
+	driver = "com.mysql.jdbc.Driver",
+	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM posts PARTITION (p1) WHERE Tags IS NOT NULL) tmp",
+	user="sherry_jiayun",
+	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
+# help test function
 def testFunc(p):
-	print ("Hello from rdd.")
+	print ("Hello from inner rdd.")
 
-def writeToNeo4j(p):
-	uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
-	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
-	session = driver.session()
+def testPrintFunction(p):
 	for x in p:
-		vertex_list = x[3].strip().split(' ')
-		for xx in vertex_list:
-			for xxx in vertex_list:
-				if not xxx == xx:
-					cypher = ""
-					cypher += "MERGE (:vertex{ name: '"+xx+"' }) " # create node 1 if not exist
-					cypher += "MERGE (:vertex{ name: '"+xxx+"'}) " # create node 2 if not exist
-					# print (cypher)
-					session.run(cypher)
-					cypher = ""
-					cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
-					cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
-					cypher += "ON CREATE SET r.weight = 0 " # initialize weight
-					cypher += "WITH r " # update relationship
-					cypher += "SET r.weight = r.weight + "+str(x[4])
-					# print (xx,xxx,x[4])
-					session.run(cypher)
-	session.close()
+		print(x)
 
-rdd = sc.parallelize(df.collect())
-rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[0]+x[1]+x[2]))
+# def createOrUpdateNode(p):
+	# include time
 
-rdd_clean.foreachPartition(writeToNeo4j)
-# df.rdd.foreachPartition(f)
+def combineKeyForRelationship(x):
+	# for relationship
+	return (x[0]+'|'+x[1])
 
-# create vertex and edge 
-# MERGE (:vertex{ name: '"+node_name_1+"'})
-# MERGE (:vertex{ name: '"+node_name_2+"'})
-# create edge
-# MATCH (v1:vertex {name:'"+node_name_1+"'}),(v2:vertex { name:'"+node_name_2+"'})
-# MERGE (v1)-[r:Group { name:'"+node_name_1+'-'+node_name_2+"'}]->(v2)
-# ON CREATE SET r.weight = 0 
-# WITH r 
-# SET r.weight = r.weight + str(new)
-'''check_list = list()
-for x in df.collect():
+def removeKeyForRelationship(x):
+	# for node 
+	return x.split('|')
+
+def combineKey(x):
+	# for node 
+	return (x[0]+'|'+str(x[2]))
+
+def removeKey(x):
+	# for node
+	return x.split('|')[0]
+
+def innerrdd(x):
 	vertex_list = x[3].strip().split(' ')
+	tmplist = list()
 	for xx in vertex_list:
 		for xxx in vertex_list:
 			if not xxx == xx:
-				cypher = ""
-				cypher += "MERGE (:vertex{ name: '"+xx+"' }) " # create node 1 if not exist
-				cypher += "MERGE (:vertex{ name: '"+xxx+"'}) " # create node 2 if not exist
-				session.run(cypher)
-				cypher = ""
-				cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
-				cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
-				cypher += "ON CREATE SET r.weight = 0 " # initialize weight
-				cypher += "WITH r " # update relationship
-				cypher += "SET r.weight = r.weight + "+str(x[4])
-				print (xx,xxx,x[4])
-				session.run(cypher)'''
-	
+				# check whether already in the dict
+				# x[4] id, x[5] weight
+				# tmpitem[node1,node2,postid,time,weight]
+				tmpitem = [xx,xxx,x[4],x[5],x[6]]
+				tmplist.append(tmpitem)
+	return tmplist
+
+def writeNode(p):
+	# connect to neo4j
+	uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
+	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
+	session = driver.session()
+	# for node, (weight, count)
+	for x in p:
+		cypher = ""
+		cypher += "MERGE (v:vertex{ name: '"+ x[0] +"' }) "
+		cypher += "ON CREATE SET v.weight = 0,v.count = 0 "
+		cypher += "WITH v "
+		cypher += "SET v.weight = v.weight + "+str(x[1][0]) + ","
+		cypher += "v.count = v.count + "+ str(x[1][1])
+		print (cypher)
+		session.run(cypher)
+	session.close()
+
+def writeRelationship(p):
+	# connect to neo4j
+	uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
+	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
+	session = driver.session()
+	# for relationship, (weight, count)
+	for x in p:
+		[xx,xxx] = removeKeyForRelationship(x[0])
+		cypher = ""
+		cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
+		cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
+		cypher += "ON CREATE SET r.weight = 0,r.count = 0 " # initialize weight
+		cypher += "WITH r " # update relationship
+		cypher += "SET r.weight = r.weight + "+str(x[1][0]) +","
+		cypher += "r.count = r.count + "+ str(x[1][0])
+		print (cypher) 
+		session.run(cypher)
+	session.close()
+
+rdd = sc.parallelize(df.collect())
+rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
+rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
+
+
+# map and collect relationship weight need to divided by 2
+# relationship, weight and count
+rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
+rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y: (x[0]+y[0],x[1]+y[1]))
+
+# remove duplicate
+rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
+rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
+
+# for node, (weight,count)
+rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+# write to database for node
+rdd_node_cal.foreachPartition(writeNode)
+# write to database for relationship
+rdd_rel_count.foreachPartition(writeRelationship)
+
+
+rdd_fm.foreachPartition(testPrintFunction)
+
+rdd_clean.foreachPartition(writeToNeo4j)
+rdd_test = rdd_clean.foreachPartition(innerrdd)
