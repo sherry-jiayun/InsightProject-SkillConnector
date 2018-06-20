@@ -10,12 +10,12 @@ sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
 # get null null tags from 
-df = sqlContext.read.format("jdbc").options(
-	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
-	driver = "com.mysql.jdbc.Driver",
-	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts PARTITION (p0) WHERE Tags IS NOT NULL) tmp",
-	user="sherry_jiayun",
-	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
+# df = sqlContext.read.format("jdbc").options(
+# 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+# 	driver = "com.mysql.jdbc.Driver",
+# 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts PARTITION (p0) WHERE Tags IS NOT NULL) tmp",
+# 	user="sherry_jiayun",
+# 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
 df = sqlContext.read.format("jdbc").options(
 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",
 	driver = "com.mysql.jdbc.Driver",
@@ -29,9 +29,6 @@ def testFunc(p):
 def testPrintFunction(p):
 	for x in p:
 		print(x)
-
-# def createOrUpdateNode(p):
-	# include time
 
 def combineKeyForRelationship(x):
 	# for relationship
