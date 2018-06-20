@@ -30,20 +30,24 @@ def testPrintFunction(p):
 	for x in p:
 		print(x)
 
+# combine node1+node2 
 def combineKeyForRelationship(x):
 	# for relationship
 	return (x[0]+'|'+x[1])
-
 def removeKeyForRelationship(x):
 	# for node 
 	return x.split('|')
 
-def combineKey(x):
-	# for node 
-	return (x[0]+'|'+str(x[2]))
+# combine node1+date
+def combineKeyForDate(x):
+	return (x[0]+'|'+x[3])
+def removeKeyForDate(x):
+	return x.split('|')[0],x.split('|')[1]
 
+# combine node1+postid
+def combineKey(x):
+	return (x[0]+'|'+str(x[2]))
 def removeKey(x):
-	# for node
 	return x.split('|')[0]
 
 def innerrdd(x):
@@ -99,7 +103,6 @@ rdd = sc.parallelize(df.collect())
 rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
 rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
-
 # map and collect relationship weight need to divided by 2
 # relationship, weight and count
 rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
@@ -108,16 +111,14 @@ rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(valu
 # remove duplicate
 rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
 rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
-
 # for node, (weight,count)
 rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+
+# time and node key: time+node, value 1
+rdd_date_key = rdd_fm.map(lambda x: (combineKeyForDate(x),1)).combineByKey(lambda value:(value),lambda x,value:(value+x),lambda x,y:(x+y))
+rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
+
 # write to database for node
 rdd_node_cal.foreachPartition(writeNode)
 # write to database for relationship
 rdd_rel_count.foreachPartition(writeRelationship)
-
-
-rdd_fm.foreachPartition(testPrintFunction)
-
-rdd_clean.foreachPartition(writeToNeo4j)
-rdd_test = rdd_clean.foreachPartition(innerrdd)
