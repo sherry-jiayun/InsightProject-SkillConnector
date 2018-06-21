@@ -81,7 +81,7 @@ def writeNode(p):
 		cypher += "WITH v "
 		cypher += "SET v.weight = v.weight + "+str(x[1][0]) + ","
 		cypher += "v.count = v.count + "+ str(x[1][1])
-		# session.run(cypher)
+		session.run(cypher)
 	session.close()
 
 def writeRelationship(p):
@@ -99,7 +99,7 @@ def writeRelationship(p):
 		cypher += "WITH r " # update relationship
 		cypher += "SET r.weight = r.weight + "+str(x[1][0]) +","
 		cypher += "r.count = r.count + "+ str(x[1][0])
-		# session.run(cypher)
+		session.run(cypher)
 	session.close()
 
 def writeDate(p):
