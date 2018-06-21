@@ -9,19 +9,26 @@ from pyspark.sql.functions import *
 sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
-# get null null tags from 
-# df = sqlContext.read.format("jdbc").options(
-# 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
-# 	driver = "com.mysql.jdbc.Driver",
-# 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts PARTITION (p0) WHERE Tags IS NOT NULL) tmp",
-# 	user="sherry_jiayun",
-# 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
-df = sqlContext.read.format("jdbc").options(
-	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/stackoverflow2010",
+CURRENT_VALUE_LOW = 0
+CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000 # 50000 ROWS PER LOOP
+df_MAX = sqlContext.read.format("jdbc").options(
+	url = "jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	driver = "com.mysql.jdbc.Driver",
-	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM posts PARTITION (p1) WHERE Tags IS NOT NULL) tmp",
-	user="sherry_jiayun",
-	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
+	dbtable = "(SELECT MAX(Id) FROM Posts) tmp",
+	user = "sherry_jiayun",
+	password = "yjy05050609").load()
+MAX_VALUE = df_MAX.collect()
+MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
+print(MAX_VALUE)
+
+# get null null tags from 
+df = sqlContext.read.format("jdbc").options(
+ 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+ 	driver = "com.mysql.jdbc.Driver",
+ 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > 0 AND Id < 10000 AND Tags IS NOT NULL) tmp",
+ 	user="sherry_jiayun",
+ 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
+
 # help test function
 def testFunc(p):
 	print ("Hello from inner rdd.")
@@ -34,13 +41,17 @@ def testPrintFunction(p):
 def combineKeyForRelationship(x):
 	# for relationship
 	return (x[0]+'|'+x[1])
+
 def removeKeyForRelationship(x):
 	# for node 
 	return x.split('|')
 
 # combine node1+date
 def combineKeyForDate(x):
-	return (x[0]+'|'+x[3])
+	# convert dateframe to string 
+	dateStr = str(x[3]).split(' ')[0]
+	return (x[0]+'|'+dateStr)
+
 def removeKeyForDate(x):
 	return x.split('|')[0],x.split('|')[1]
 
@@ -99,26 +110,65 @@ def writeRelationship(p):
 		session.run(cypher)
 	session.close()
 
-rdd = sc.parallelize(df.collect())
-rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
-rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
+def writeDate(p):
+	# connect to postgresql
+	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
+	conn = psycopg2.connect(postgre)
+	cur = conn.cursor()
+	data_dict = dict()
+	for x in p:
+		data_tmp_1 = (x[0][1],x[0][0],x[1]) # time, tech, appNum for update
+		data_tmp_2 = (x[0][1],x[0][0],0) # time, tech 0 for insert
+		# decide database 
+		data_base = x[0][1].split('-')[0]
+		if "DATE_"+data_base not in data_dict.keys():
+			data_dict["DATE_"+data_base] = dict()
+		data_dict["DATE_"+data_base][0].append(data_tmp_1)
+		data_dict['DATE_'+data_base][1].append(data_tmp_2)
+	for db in data_dict.keys():
+		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
+		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
+		# print(sql_insert)
+		cur.execute(sql_insert)
+		conn.commit()
+		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
+		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
+		cur.execute(sql_insert)
+		conn.commit()
+	cur.close()
+	conn.close()
 
-# map and collect relationship weight need to divided by 2
-# relationship, weight and count
-rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
-rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y: (x[0]+y[0],x[1]+y[1]))
+while (CURRENT_VALUE_LOW < MAX_VALUE or CURRENT_VALUE_LOW > 51000):
+	# get null null tags from mysql db
+	df = sqlContext.read.format("jdbc").options(
+	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	 	driver = "com.mysql.jdbc.Driver",
+	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
+	 	user="sherry_jiayun",
+	 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',50000).option('partitionColumn',6).load()
+	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
-# remove duplicate
-rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
-rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
-# for node, (weight,count)
-rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+	rdd = sc.parallelize(df.collect())
+	rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
+	rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
-# time and node key: time+node, value 1
-rdd_date_key = rdd_fm.map(lambda x: (combineKeyForDate(x),1)).combineByKey(lambda value:(value),lambda x,value:(value+x),lambda x,y:(x+y))
-rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
+	# map and collect relationship weight need to divided by 2
+	# relationship, weight and count
+	rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
+	rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y: (x[0]+y[0],x[1]+y[1]))
 
-# write to database for node
-rdd_node_cal.foreachPartition(writeNode)
-# write to database for relationship
-rdd_rel_count.foreachPartition(writeRelationship)
+	# remove duplicate
+	rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
+	rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
+	# for node, (weight,count)
+	rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+
+	# time and node key: time+node, value 1
+	rdd_date_key = rdd_fm.map(lambda x: (combineKeyForDate(x),1)).combineByKey(lambda value:(value),lambda x,value:(value+x),lambda x,y:(x+y))
+	rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
+	rdd_date_cal.foreachPartition(writeDate)
+	# write to database for node
+	rdd_node_cal.foreachPartition(writeNode)
+	# write to database for relationship
+	rdd_rel_count.foreachPartition(writeRelationship)
