@@ -22,14 +22,6 @@ MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
 print(MAX_VALUE)
 
-# get null null tags from 
-df = sqlContext.read.format("jdbc").options(
- 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
- 	driver = "com.mysql.jdbc.Driver",
- 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > 0 AND Id < 10000 AND Tags IS NOT NULL) tmp",
- 	user="sherry_jiayun",
- 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',10000).option('partitionColumn',6).load()
-
 # help test function
 def testFunc(p):
 	print ("Hello from inner rdd.")
@@ -89,8 +81,7 @@ def writeNode(p):
 		cypher += "WITH v "
 		cypher += "SET v.weight = v.weight + "+str(x[1][0]) + ","
 		cypher += "v.count = v.count + "+ str(x[1][1])
-		print (cypher)
-		session.run(cypher)
+		# session.run(cypher)
 	session.close()
 
 def writeRelationship(p):
@@ -108,8 +99,7 @@ def writeRelationship(p):
 		cypher += "WITH r " # update relationship
 		cypher += "SET r.weight = r.weight + "+str(x[1][0]) +","
 		cypher += "r.count = r.count + "+ str(x[1][0])
-		print (cypher) 
-		session.run(cypher)
+		# session.run(cypher)
 	session.close()
 
 def writeDate(p):
@@ -135,17 +125,16 @@ def writeDate(p):
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
-		# print(sql_insert)
-		cur.execute(sql_insert)
-		conn.commit()
+		# cur.execute(sql_insert)
+		# conn.commit()
 		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
 		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
-		cur.execute(sql_insert)
-		conn.commit()
+		# cur.execute(sql_insert)
+		# conn.commit()
 	cur.close()
 	conn.close()
 
-while (CURRENT_VALUE_LOW < MAX_VALUE or CURRENT_VALUE_LOW > 51000):
+while (CURRENT_VALUE_LOW < MAX_VALUE and CURRENT_VALUE_LOW < 51000):
 	# get null null tags from mysql db
 	df = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
