@@ -125,12 +125,12 @@ def writeDate(p):
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
-		# cur.execute(sql_insert)
-		# conn.commit()
+		cur.execute(sql_insert)
+		conn.commit()
 		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
 		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
-		# cur.execute(sql_insert)
-		# conn.commit()
+		cur.execute(sql_insert)
+		conn.commit()
 	cur.close()
 	conn.close()
 
