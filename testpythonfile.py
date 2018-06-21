@@ -59,6 +59,7 @@ def removeKeyForDate(x):
 # combine node1+postid
 def combineKey(x):
 	return (x[0]+'|'+str(x[2]))
+
 def removeKey(x):
 	return x.split('|')[0]
 
@@ -118,14 +119,19 @@ def writeDate(p):
 	cur = conn.cursor()
 	data_dict = dict()
 	for x in p:
-		data_tmp_1 = (x[0][1],x[0][0],x[1]) # time, tech, appNum for update
-		data_tmp_2 = (x[0][1],x[0][0],0) # time, tech 0 for insert
-		# decide database 
-		data_base = x[0][1].split('-')[0]
-		if "DATE_"+data_base not in data_dict.keys():
-			data_dict["DATE_"+data_base] = dict()
-		data_dict["DATE_"+data_base][0].append(data_tmp_1)
-		data_dict['DATE_'+data_base][1].append(data_tmp_2)
+		if len(x) != 2 or len(x[0]) != 2:
+			pass
+		else:
+			data_tmp_1 = (x[0][1],x[0][0],x[1]) # time, tech, appNum for update
+			data_tmp_2 = (x[0][1],x[0][0],0) # time, tech 0 for insert
+			# decide database 
+			data_base = x[0][1].split('-')[0]
+			if "DATE_"+data_base not in data_dict.keys():
+				data_dict["DATE_"+data_base] = dict()
+				data_dict["DATE_"+data_base][0] = list()
+				data_dict["DATE_"+data_base][1] = list()
+			data_dict["DATE_"+data_base][0].append(data_tmp_1)
+			data_dict['DATE_'+data_base][1].append(data_tmp_2)
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
