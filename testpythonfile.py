@@ -167,11 +167,7 @@ def writeDate(p):
 	cur.close()
 	conn.close()
 
-MAX_VALUE = 50000 * 2
-
-print (MAX_VALUE)
-print (CURRENT_VALUE_LOW)
-print (CURRENT_VALUE_UPPER)
+# MAX_VALUE = 50000 * 2
 
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
@@ -208,4 +204,4 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationship)
 
-time.sleep(10)
+# time.sleep(10)
