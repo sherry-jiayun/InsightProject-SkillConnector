@@ -4,6 +4,7 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 import psycopg2
+import time
 
 
 # hardcode
@@ -94,7 +95,7 @@ def writeNode(p):
 	cypher += " MERGE (n:vertex {name:row.name})"
 	cypher += " ON CREATE SET n.weight = 0,n.count = 0"
 	cypher += " SET n.weight = n.weight + row.weight,n.count = n.count + row.count"
-	session.run(cypher)
+	# session.run(cypher)
 	session.close()
 
 def writeRelationship(p):
@@ -113,31 +114,26 @@ def writeRelationship(p):
 		cypher_tmp += 'weight:'+str(x[1][0])+','
 		cypher_tmp += 'count:'+str(x[1][1])+'},'
 		cypher += cypher_tmp
-		if len(cypher) > 50:
-			if cypher[-1] == ',':
-				cypher = cypher[:-1]
-			cypher += "] as data"
-			cypher += " UNWIND data as row"
-			cypher += " MATCH (v1:vertex {name:row.from})"
-			cypher += " MATCH (v2:vertex {name:row.to})"
-			cypher += " MERGE (v1)-[r:Group]->(v2)"
-			cypher += " ON CREATE SET r.name = row.name,r.weight = 0,r.count = 0"
-			cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
-			# print(cypher)
-			session.run(cypher)
-			cypher = "WITH ["
-	if len(cypher) > 7:
-		if cypher[-1] == ',':
-			cypher = cypher[:-1]
-		cypher += "] as data"
-		cypher += " UNWIND data as row"
-		cypher += " MATCH (v1:vertex {name:row.from})"
-		cypher += " MATCH (v2:vertex {name:row.to})"
-		cypher += " MERGE (v1)-[r:Group]->(v2)"
-		cypher += " ON CREATE SET r.name = row.name,r.weight = 0,weight = 0,r.count = 0"
-		cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
-		session.run(cypher)
-	session.close()
+	if cypher[-1] == ',':
+		cypher = cypher[:-1]
+	cypher += "] as data"
+	cypher += " UNWIND data as row"
+	cypher += " MATCH (v1:vertex {name:row.from})"
+	cypher += " MATCH (v2:vertex {name:row.to})"
+	cypher += " MERGE (v1)-[r:Group]->(v2)"
+	cypher += " ON CREATE SET r.name = row.name,r.weight = 0,weight = 0,r.count = 0"
+	cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
+	# loop batch job
+	flag = True
+	while (flag):
+		try:
+			# session.run(cypher)
+			session.close
+			break
+		except:
+			time.sleep(1)
+
+session.close()
 
 def writeDate(p):
 	# connect to postgresql
@@ -162,15 +158,16 @@ def writeDate(p):
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
-		cur.execute(sql_insert)
-		conn.commit()
+		# cur.execute(sql_insert)
+		# conn.commit()
 		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
 		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
-		cur.execute(sql_insert)
-		conn.commit()
+		# cur.execute(sql_insert)
+		# conn.commit()
 	cur.close()
 	conn.close()
 
+MAX_VALUE = 50000
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	df = sqlContext.read.format("jdbc").options(
