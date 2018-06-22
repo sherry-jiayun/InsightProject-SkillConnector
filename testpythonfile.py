@@ -167,43 +167,45 @@ def writeDate(p):
 	cur.close()
 	conn.close()
 
-MAX_VALUE = 50000
-# while (CURRENT_VALUE_LOW < MAX_VALUE):
+MAX_VALUE = 50000 * 2
+
 print (MAX_VALUE)
 print (CURRENT_VALUE_LOW)
 print (CURRENT_VALUE_UPPER)
-# get null null tags from mysql db
-df = sqlContext.read.format("jdbc").options(
- 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
- 	driver = "com.mysql.jdbc.Driver",
- 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
- 	user="sherry_jiayun",
- 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',50000).option('partitionColumn',6).load()
-CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
-CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
-rdd = sc.parallelize(df.collect())
-rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
-rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
+while (CURRENT_VALUE_LOW < MAX_VALUE):
+	# get null null tags from mysql db
+	df = sqlContext.read.format("jdbc").options(
+	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	 	driver = "com.mysql.jdbc.Driver",
+	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
+	 	user="sherry_jiayun",
+	 	password="yjy05050609").option('numPartitions',4).option('lowerBound',1).option('upperBound',50000).option('partitionColumn',6).load()
+	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
-# map and collect relationship weight need to divided by 2
-# relationship, weight and count
-rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
-rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y: (x[0]+y[0],x[1]+y[1]))
+	rdd = sc.parallelize(df.collect())
+	rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
+	rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
-# remove duplicate
-rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
-rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
-# for node, (weight,count)
-rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+	# map and collect relationship weight need to divided by 2
+	# relationship, weight and count
+	rdd_rel = rdd_fm.map(lambda x: (combineKeyForRelationship(x),x[4]))
+	rdd_rel_count = rdd_rel.combineByKey(lambda value:(value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y: (x[0]+y[0],x[1]+y[1]))
 
-# time and node key: time+node, value 1
-rdd_date_key = rdd_fm.map(lambda x: (combineKeyForDate(x),1)).combineByKey(lambda value:(value),lambda x,value:(value+x),lambda x,y:(x+y))
-rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
-rdd_date_cal.foreachPartition(writeDate)
-# write to database for node
-rdd_node_cal.foreachPartition(writeNode)
-# write to database for relationship
-rdd_rel_count.foreachPartition(writeRelationship)
+	# remove duplicate
+	rdd_fm_node = rdd_fm.map(lambda x: (combineKey(x),x[4])).combineByKey(lambda value: (value),lambda x, value:(value),lambda x, y: (x))
+	rdd_node_flat = rdd_fm_node.map(lambda x: (removeKey(x[0]),x[1]))
+	# for node, (weight,count)
+	rdd_node_cal = rdd_node_flat.combineByKey(lambda value: (value,1),lambda x,value:(value+x[0],x[1]+1),lambda x,y:(x[0]+y[0],x[1]+y[1]))
+
+	# time and node key: time+node, value 1
+	rdd_date_key = rdd_fm.map(lambda x: (combineKeyForDate(x),1)).combineByKey(lambda value:(value),lambda x,value:(value+x),lambda x,y:(x+y))
+	rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
+	rdd_date_cal.foreachPartition(writeDate)
+	# write to database for node
+	rdd_node_cal.foreachPartition(writeNode)
+	# write to database for relationship
+	rdd_rel_count.foreachPartition(writeRelationship)
 
 time.sleep(10)
