@@ -67,21 +67,31 @@ def innerrdd(x):
 				tmpitem = [xx,xxx,x[4],x[5],x[6]]
 				tmplist.append(tmpitem)
 	return tmplist
-
+# WITH [{name:"c#",weight:1,count:1},{name:".net",weight:2,count:2}] as data
+# UNWIND data as row
+# MERGE (n:Label {name:row.name})
+# ON CREATE SET n.weight = 0,n.count = 0
+# SET n.weight = n.weight + row.weight,n.count = n.count + row.count
 def writeNode(p):
 	# connect to neo4j
 	uri = "bolt://ec2-34-234-207-154.compute-1.amazonaws.com:7687"
 	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
 	session = driver.session()
 	# for node, (weight, count)
+	cypher = "WITH ["
 	for x in p:
-		cypher = ""
-		cypher += "MERGE (v:vertex{ name: '"+ x[0] +"' }) "
-		cypher += "ON CREATE SET v.weight = 0,v.count = 0 "
-		cypher += "WITH v "
-		cypher += "SET v.weight = v.weight + "+str(x[1][0]) + ","
-		cypher += "v.count = v.count + "+ str(x[1][1])
-		session.run(cypher)
+		cypher_tmp = '{'
+		cypher_tmp += 'name:"'+x[0]+'",'
+		cypher_tmp += 'weight:' + str(x[1][0]) + ','
+		cypher_tmp += 'count:' + str(x[1][1]) + '},'
+		cypher += cypher_tmp
+	cypher = cypher[:-1]
+	cypher += "] as data"
+	cypher += " UNWIND data as row"
+	cypher += " MERGE (n:vertex {name:row.name})"
+	cypher += " ON CREATE SET n.weight = 0,n.count = 0"
+	cypher += " SET n.weight = n.weight + row.weight,n.count = n.count + row.count"
+	session.run(cypher)
 	session.close()
 
 def writeRelationship(p):
@@ -90,15 +100,39 @@ def writeRelationship(p):
 	driver = GraphDatabase.driver(uri,auth=("neo4j","yjy05050609"))
 	session = driver.session()
 	# for relationship, (weight, count)
+	cypher = "WITH ["
 	for x in p:
 		[xx,xxx] = removeKeyForRelationship(x[0])
-		cypher = ""
-		cypher += "MATCH (v1:vertex { name:'"+xx+"' }), (v2:vertex { name:'"+xxx+"'}) "
-		cypher += "MERGE (v1)-[r:Group { name:'"+xx+'-'+xxx+"'}]->(v2) " # create relationship
-		cypher += "ON CREATE SET r.weight = 0,r.count = 0 " # initialize weight
-		cypher += "WITH r " # update relationship
-		cypher += "SET r.weight = r.weight + "+str(x[1][0]) +","
-		cypher += "r.count = r.count + "+ str(x[1][0])
+		cypher_tmp = '{'
+		cypher_tmp += 'from:"'+xx+'",'
+		cypher_tmp += 'to:"'+xxx+'",'
+		cypher_tmp += 'name:"'+xx+'-'+xxx+'",'
+		cypher_tmp += 'weight:'+str(x[1][0])+','
+		cypher_tmp += 'count:'+str(x[1][1])+'},'
+		cypher += cypher_tmp
+		if len(cypher) > 50:
+			if cypher[-1] == ',':
+				cypher = cypher[:-1]
+			cypher += "] as data"
+			cypher += " UNWIND data as row"
+			cypher += " MATCH (v1:vertex {name:row.from})"
+			cypher += " MATCH (v2:vertex {name:row.to})"
+			cypher += " MERGE (v1)-[r:Group]->(v2)"
+			cypher += " ON CREATE SET r.name = row.name,r.weight = 0,r.count = 0"
+			cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
+			# print(cypher)
+			session.run(cypher)
+			cypher = "WITH ["
+	if len(cypher) > 7:
+		if cypher[-1] == ',':
+			cypher = cypher[:-1]
+		cypher += "] as data"
+		cypher += " UNWIND data as row"
+		cypher += " MATCH (v1:vertex {name:row.from})"
+		cypher += " MATCH (v2:vertex {name:row.to})"
+		cypher += " MERGE (v1)-[r:Group]->(v2)"
+		cypher += " ON CREATE SET r.name = row.name,r.weight = 0,weight = 0,r.count = 0"
+		cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
 		session.run(cypher)
 	session.close()
 
