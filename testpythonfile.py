@@ -125,13 +125,14 @@ def writeRelationship(p):
 	cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
 	# loop batch job
 	flag = True
-	while (flag):
-		try:
-			# session.run(cypher)
-			session.close
-			break
-		except:
-			time.sleep(1)
+	# while (flag):
+	#	try:
+	#		# session.run(cypher)
+	#		session.close()
+	#		break
+	#	except:
+	#		time.sleep(1)
+	session.close()
 
 # session.close()
 
