@@ -133,7 +133,7 @@ def writeRelationship(p):
 		except:
 			time.sleep(1)
 
-session.close()
+# session.close()
 
 def writeDate(p):
 	# connect to postgresql
