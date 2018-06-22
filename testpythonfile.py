@@ -205,3 +205,5 @@ rdd_date_cal.foreachPartition(writeDate)
 rdd_node_cal.foreachPartition(writeNode)
 # write to database for relationship
 rdd_rel_count.foreachPartition(writeRelationship)
+
+time.sleep(10)
