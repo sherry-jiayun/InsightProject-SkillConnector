@@ -20,6 +20,9 @@ df_MAX = sqlContext.read.format("jdbc").options(
 	password = "yjy05050609").load()
 MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
+
+# only test first 3 
+MAX_VALUE = MAX_VALUE / 3
 print(MAX_VALUE)
 
 # help test function
@@ -168,7 +171,7 @@ def writeDate(p):
 	cur.close()
 	conn.close()
 
-while (CURRENT_VALUE_LOW < MAX_VALUE and CURRENT_VALUE_LOW < 51000):
+while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	df = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
