@@ -22,8 +22,8 @@ df_MAX = sqlContext.read.format("jdbc").options(
 MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
 
-# only test first 3 
-MAX_VALUE = MAX_VALUE
+# only test first 1/3 
+MAX_VALUE = MAX_VALUE / 3
 print(MAX_VALUE)
 
 # help test function
@@ -169,8 +169,8 @@ def writeDate(p):
 	conn.close()
 
 # MAX_VALUE = 50000 * 2
-CURRENT_VALUE_UPPER = MAX_VALUE
-CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
+# CURRENT_VALUE_UPPER = MAX_VALUE
+# CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
@@ -184,7 +184,7 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
 	rdd = sc.parallelize(df.collect())
-	rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
+	'''rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
 	rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
 	# map and collect relationship weight need to divided by 2
@@ -205,6 +205,6 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# write to database for node
 	rdd_node_cal.foreachPartition(writeNode)
 	# write to database for relationship
-	rdd_rel_count.foreachPartition(writeRelationship)
+	rdd_rel_count.foreachPartition(writeRelationship)'''
 
 # time.sleep(10)
