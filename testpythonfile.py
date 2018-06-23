@@ -12,7 +12,7 @@ sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
 CURRENT_VALUE_LOW = 0
-CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000 # 50000 ROWS PER LOOP
+CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000 # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
 	url = "jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	driver = "com.mysql.jdbc.Driver",
@@ -177,9 +177,9 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	 	driver = "com.mysql.jdbc.Driver",
 	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
 	 	user="sherry_jiayun",
-	 	password="yjy05050609").option('numPartitions',16).option('lowerBound',1).option('upperBound',25000).option('partitionColumn',6).load()
+	 	password="yjy05050609").option('numPartitions',16).option('lowerBound',1).option('upperBound',1000).option('partitionColumn',6).load()
 	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
-	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
 	rdd = sc.parallelize(df.collect())
 	rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
