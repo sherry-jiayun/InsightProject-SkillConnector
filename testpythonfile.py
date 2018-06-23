@@ -23,7 +23,7 @@ MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
 
 # only test first 3 
-MAX_VALUE = MAX_VALUE / 3
+MAX_VALUE = MAX_VALUE
 print(MAX_VALUE)
 
 # help test function
@@ -169,7 +169,8 @@ def writeDate(p):
 	conn.close()
 
 # MAX_VALUE = 50000 * 2
-
+CURRENT_VALUE_UPPER = MAX_VALUE
+CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	df = sqlContext.read.format("jdbc").options(
