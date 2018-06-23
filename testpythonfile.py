@@ -182,7 +182,7 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
 	 	user="sherry_jiayun",
 	 	password="yjy05050609").option('numPartitions',18).option('lowerBound',1).option('upperBound',12500).option('partitionColumn',6).load()
-	CURRENT_VALUE_LOW = CURRENT_VALUE_LOW - 100000
+	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
 	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
 	#df.rdd.foreachPartition()
 	df.count()
