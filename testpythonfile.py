@@ -168,9 +168,6 @@ def writeDate(p):
 	cur.close()
 	conn.close()
 
-def testFile(){
-	
-}
 # MAX_VALUE = 50000 * 2
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
