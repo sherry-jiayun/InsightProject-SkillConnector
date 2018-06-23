@@ -183,7 +183,9 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
 	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
 
-	rdd = sc.parallelize(df.collect())
+	df.collect()
+
+	# rdd = sc.parallelize(df.collect())
 	'''rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
 	rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
