@@ -12,9 +12,9 @@ sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
 CURRENT_VALUE_LOW = 0
-CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000 # 50000 ROWS PER LOOP
+CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000 # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
-	url = "jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	url = "jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	driver = "com.mysql.jdbc.Driver",
 	dbtable = "(SELECT MAX(Id) FROM Posts) tmp",
 	user = "sherry_jiayun",
@@ -168,22 +168,28 @@ def writeDate(p):
 	cur.close()
 	conn.close()
 
+def testFile(){
+	
+}
 # MAX_VALUE = 50000 * 2
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
-	print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
+	# print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
+	# CURRENT_VALUE_LOW = 3000000
+	# CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
 	df = sqlContext.read.format("jdbc").options(
-	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	 	driver = "com.mysql.jdbc.Driver",
 	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
 	 	user="sherry_jiayun",
-	 	password="yjy05050609").option('numPartitions',16).option('lowerBound',1).option('upperBound',12500).option('partitionColumn',6).load()
-	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
-	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 50000
-
-	df.collect()
+	 	password="yjy05050609").option('numPartitions',18).option('lowerBound',1).option('upperBound',12500).option('partitionColumn',6).load()
+	CURRENT_VALUE_LOW = CURRENT_VALUE_LOW - 100000
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
+	#df.rdd.foreachPartition()
+	df.count()
+#df.collect()
 
 	# rdd = sc.parallelize(df.collect())
 	'''rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
