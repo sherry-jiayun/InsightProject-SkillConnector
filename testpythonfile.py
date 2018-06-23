@@ -173,6 +173,7 @@ CURRENT_VALUE_UPPER = MAX_VALUE
 CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
+	print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
 	df = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://sg-cli-test.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	 	driver = "com.mysql.jdbc.Driver",
