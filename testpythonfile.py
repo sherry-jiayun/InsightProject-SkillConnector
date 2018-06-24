@@ -136,7 +136,31 @@ def writeRelationship(p):
 			time.sleep(1)
 	session.close()
 
-# session.close()
+def writeRelationshipPostgre(p):
+	# connect to postgresql
+	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
+	conn = psycopg2.connect(postgre)
+	cur = conn.cursor()
+	data_dict = dict()
+	data_dict[0] = list()
+	data_dict[1] = list()
+	for x in p:
+		[xx,xxx] = removeKeyForRelationship(x[0])
+		data_tmp_1 = (xx,xxx,0,0)
+		data_tmp_2 = (xx,xxx,x[1][0],x[1][1])
+		data_dict[0].append(data_tmp_1)
+		data_dict[1].append(data_tmp_2)
+	db = "TECH_REL"
+	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s,%s)",x) for x in data_dict[0])
+	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT technode1,technode2 DO NOTHING;"
+	cur.execute(sql_insert)
+	conn.commit()
+	data_str_update = ','.join(cur.mogrify("(date%s,%s,%s,%s)",x) for x in data_dict[1])
+	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode1,technode2,weight,count) WHERE c.technode1 = d.technode1 and c.technode2 = d.technode2;"
+	cur.execute(sql_insert)
+	conn.commit()
+	cur.close()
+	conn.close()
 
 def writeDate(p):
 	# connect to postgresql
@@ -156,8 +180,8 @@ def writeDate(p):
 				data_dict["DATE_"+data_base] = dict()
 				data_dict["DATE_"+data_base][0] = list()
 				data_dict["DATE_"+data_base][1] = list()
-			data_dict["DATE_"+data_base][0].append(data_tmp_1)
-			data_dict['DATE_'+data_base][1].append(data_tmp_2)
+			data_dict["DATE_"+data_base][0].append(data_tmp_2)
+			data_dict['DATE_'+data_base][1].append(data_tmp_1)
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
@@ -228,7 +252,7 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# write to database for node
 	rdd_node_cal.foreachPartition(writeNode)
 	# write to database for relationship
-	rdd_rel_count.foreachPartition(writeRelationship)
+	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
 	count += 1
 	if count > 3:
 		break

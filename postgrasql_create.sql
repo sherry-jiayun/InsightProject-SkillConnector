@@ -14,6 +14,13 @@ CREATE DATABASE "InsightDB"
 
 SELECT * FROM pg_catalog.pg_tables;
 
+CREATE TABLE TECH_REL(
+	technode1 VARCHAR(50),
+	technode2 VARCHAR(50),
+	weight Integer,
+	count Integer,
+	PRIMARY KEY (technode1,technode2)
+);
 CREATE TABLE DATE_2008(
 	time DATE,
 	tech VARCHAR(50),
