@@ -156,7 +156,7 @@ def writeRelationshipPostgre(p):
 	cur.execute(sql_insert)
 	conn.commit()
 	data_str_update = ','.join(cur.mogrify("(date%s,%s,%s,%s)",x) for x in data_dict[1])
-	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode1,technode2,weight,count) WHERE c.technode1 = d.technode1 and c.technode2 = d.technode2;"
+	sql_update = "UPDATE " + db + " AS d SET d.weight = c.weight + d.weight, d.count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode1,technode2,weight,count) WHERE c.technode1 = d.technode1 and c.technode2 = d.technode2;"
 	cur.execute(sql_insert)
 	conn.commit()
 	cur.close()
