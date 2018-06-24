@@ -222,7 +222,6 @@ def writeDate(p):
 
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
-count = 0 
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	# print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
@@ -279,8 +278,4 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_node_cal.foreachPartition(writeNodePostgre)
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
-	count += 1
-	if count > 3:
-		break
-
 # time.sleep(10)
