@@ -142,10 +142,10 @@ def writeNodePostgre(p):
 	connecttmp = 0 
 	while (connecttmp < 10 ):
 		try:
-			conn = psycopg2.connect(postgre)
-			print ("connect attemp: ",connecttmp)
+			conn = psycopg2.connect(postgre,connect_timeout=3)
 			break
 		except:
+			print ("connect attemp: ",connecttmp)
 			time.sleep(1)
 			connecttmp += 1
 	cur = conn.cursor()
@@ -176,10 +176,10 @@ def writeRelationshipPostgre(p):
 	connecttmp = 0 # try 10 times
 	while (connecttmp < 10 ):
 		try:
-			conn = psycopg2.connect(postgre)
-			print ("connect attemp: ",connecttmp)
+			conn = psycopg2.connect(postgre,connect_timeout=3)
 			break
 		except:
+			print ("connect attemp: ",connecttmp)
 			time.sleep(1)
 			connecttmp += 1
 	cur = conn.cursor()
@@ -210,7 +210,7 @@ def writeDate(p):
 	connecttmp = 0 # try 10 times
 	while (connecttmp < 10 ):
 		try:
-			conn = psycopg2.connect(postgre)
+			conn = psycopg2.connect(postgre,connect_timeout=3)
 			break
 		except:
 			print ("connect attemp: ",connecttmp)
