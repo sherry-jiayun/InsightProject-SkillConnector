@@ -11,8 +11,10 @@ import time
 sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
+partitionNum = 18
+num_of_row = 100000
 CURRENT_VALUE_LOW = 0
-CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000 # 50000 ROWS PER LOOP
+CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
 	url = "jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	driver = "com.mysql.jdbc.Driver",
@@ -95,7 +97,7 @@ def writeNode(p):
 	cypher += " MERGE (n:vertex {name:row.name})"
 	cypher += " ON CREATE SET n.weight = 0,n.count = 0"
 	cypher += " SET n.weight = n.weight + row.weight,n.count = n.count + row.count"
-	# session.run(cypher)
+	session.run(cypher)
 	session.close()
 
 def writeRelationship(p):
@@ -125,13 +127,13 @@ def writeRelationship(p):
 	cypher += " SET r.weight = r.weight + row.weight,r.count = r.count + row.count"
 	# loop batch job
 	flag = True
-	# while (flag):
-	#	try:
-	#		# session.run(cypher)
-	#		session.close()
-	#		break
-	#	except:
-	#		time.sleep(1)
+	while (flag):
+		try:
+			session.run(cypher)
+			session.close()
+			break
+		except:
+			time.sleep(1)
 	session.close()
 
 # session.close()
@@ -159,37 +161,53 @@ def writeDate(p):
 	for db in data_dict.keys():
 		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
 		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
-		# cur.execute(sql_insert)
-		# conn.commit()
+		cur.execute(sql_insert)
+		conn.commit()
 		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
 		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
-		# cur.execute(sql_insert)
-		# conn.commit()
+		cur.execute(sql_insert)
+		conn.commit()
 	cur.close()
 	conn.close()
 
-# MAX_VALUE = 50000 * 2
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
+count = 0 
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	# print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
 	# CURRENT_VALUE_LOW = 3000000
 	# CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
-	df = sqlContext.read.format("jdbc").options(
+	df1 = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	 	driver = "com.mysql.jdbc.Driver",
 	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
 	 	user="sherry_jiayun",
-	 	password="yjy05050609").option('numPartitions',18).option('lowerBound',1).option('upperBound',12500).option('partitionColumn',6).load()
+	 	password="yjy05050609").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
-	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
-	#df.rdd.foreachPartition()
-	df.count()
-#df.collect()
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row
+	df2 = sqlContext.read.format("jdbc").options(
+	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	 	driver = "com.mysql.jdbc.Driver",
+	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
+	 	user="sherry_jiayun",
+	 	password="yjy05050609").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
+	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row
+	df3 = sqlContext.read.format("jdbc").options(
+	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
+	 	driver = "com.mysql.jdbc.Driver",
+	 	dbtable="(SELECT AnswerCount,CommentCount,FavoriteCount,Tags, Id, CreationDate FROM Posts WHERE Id > " + str(CURRENT_VALUE_LOW) + " AND Id < " + str(CURRENT_VALUE_UPPER) +" AND Tags IS NOT NULL) tmp",
+	 	user="sherry_jiayun",
+	 	password="yjy05050609").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
+	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
+	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row
+	df4 = df1.union(df2)
+	df5 = df4.union(df3)
+	# df5.collect()
 
-	# rdd = sc.parallelize(df.collect())
-	'''rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
+	rdd = sc.parallelize(df5.collect())
+	rdd_clean = rdd.map(lambda x:(x[0],x[1],x[2],x[3].replace('<',' ').replace('>',' ').replace('  ',' '),x[4],x[5],x[0]+x[1]+x[2]))
 	rdd_fm = rdd_clean.flatMap(lambda x: [(w) for w in innerrdd(x)])
 
 	# map and collect relationship weight need to divided by 2
@@ -210,6 +228,9 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# write to database for node
 	rdd_node_cal.foreachPartition(writeNode)
 	# write to database for relationship
-	rdd_rel_count.foreachPartition(writeRelationship)'''
+	rdd_rel_count.foreachPartition(writeRelationship)
+	count += 1
+	if count > 3:
+		break
 
 # time.sleep(10)
