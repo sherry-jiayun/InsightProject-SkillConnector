@@ -149,7 +149,7 @@ def writeNodePostgre(p):
 		data_tmp_2 = (x[0],x[1][0],x[1][1])
 		data_dict[0].append(data_tmp_1)
 		data_dict[1].append(data_tmp_2)
-	db = "TECH_REL"
+	db = "TECH_NODE"
 	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[0])
 	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (technode) DO NOTHING;"
 	cur.execute(sql_insert)
