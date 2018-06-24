@@ -169,6 +169,7 @@ def writeRelationshipPostgre(p):
 	while (connecttmp < 10 ):
 		try:
 			conn = psycopg2.connect(postgre)
+			print ("connect attemp: ",connecttmp)
 			break
 		except:
 			time.sleep(1)
@@ -204,6 +205,7 @@ def writeDate(p):
 			conn = psycopg2.connect(postgre)
 			break
 		except:
+			print ("connect attemp: ",connecttmp)
 			time.sleep(1)
 			connecttmp += 1
 	cur = conn.cursor()
