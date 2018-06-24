@@ -280,7 +280,7 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
 	count += 1
-	if count > 3:
+	if count > 5:
 		break
 sc.stop()
 # time.sleep(10)
