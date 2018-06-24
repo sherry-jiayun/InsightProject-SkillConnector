@@ -136,6 +136,32 @@ def writeRelationship(p):
 			time.sleep(1)
 	session.close()
 
+def writeNodePostgre(p):
+	# connect to postgresql
+	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
+	conn = psycopg2.connect(postgre)
+	cur = conn.cursor()
+	data_dict = dict()
+	data_dict[0] = list()
+	data_dict[1] = list()
+	for x in p:
+		data_tmp_1 = (x[0],0,0)
+		data_tmp_2 = (x[0],x[1][0],x[1][1])
+		data_dict[0].append(data_tmp_1)
+		data_dict[1].append(data_tmp_2)
+	db = "TECH_REL"
+	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[0])
+	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (technode) DO NOTHING;"
+	cur.execute(sql_insert)
+	conn.commit()
+	data_str_update = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[1])
+	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode,weight,count) WHERE c.technode = d.technode;"
+	cur.execute(sql_update)
+	conn.commit()
+	cur.close()
+	conn.close()
+
+
 def writeRelationshipPostgre(p):
 	# connect to postgresql
 	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
@@ -250,7 +276,7 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
 	rdd_date_cal.foreachPartition(writeDate)
 	# write to database for node
-	rdd_node_cal.foreachPartition(writeNode)
+	rdd_node_cal.foreachPartition(writeNodePostgre)
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
 	count += 1
