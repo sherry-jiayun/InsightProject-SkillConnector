@@ -165,7 +165,14 @@ def writeNodePostgre(p):
 def writeRelationshipPostgre(p):
 	# connect to postgresql
 	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
-	conn = psycopg2.connect(postgre)
+	connecttmp = 0 # try 10 times
+	while (connecttmp < 10 ):
+		try:
+			conn = psycopg2.connect(postgre)
+			break
+		except:
+			time.sleep(1)
+			connecttmp += 1
 	cur = conn.cursor()
 	data_dict = dict()
 	data_dict[0] = list()
@@ -191,7 +198,14 @@ def writeRelationshipPostgre(p):
 def writeDate(p):
 	# connect to postgresql
 	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
-	conn = psycopg2.connect(postgre)
+	connecttmp = 0 # try 10 times
+	while (connecttmp < 10 ):
+		try:
+			conn = psycopg2.connect(postgre)
+			break
+		except:
+			time.sleep(1)
+			connecttmp += 1
 	cur = conn.cursor()
 	data_dict = dict()
 	for x in p:
