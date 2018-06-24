@@ -215,6 +215,7 @@ def writeDate(p):
 		conn.commit()
 		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
 		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
+		print (sql_update)
 		cur.execute(sql_insert)
 		conn.commit()
 	cur.close()
@@ -222,6 +223,7 @@ def writeDate(p):
 
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
+count = 0 
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
 	# print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
@@ -278,4 +280,8 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_node_cal.foreachPartition(writeNodePostgre)
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
+	count += 1
+	if count > 3:
+		break
+sc.stop()
 # time.sleep(10)
