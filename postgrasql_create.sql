@@ -26,7 +26,6 @@ CREATE TABLE TECH_REL(
 	technode2 VARCHAR(50),
 	weight Integer,
 	count Integer,
-	id SERIAL,
 	PRIMARY KEY (technode1,technode2)
 );
 CREATE TABLE DATE_2008(
