@@ -28,6 +28,17 @@ CREATE TABLE TECH_REL(
 	count Integer,
 	PRIMARY KEY (technode1,technode2)
 );
+
+CREATE TABLE USER_TECH(
+	userId Integer,
+	userName VARCHAR(100),
+	userWebSite VARCHAR(100),
+	tech VARCHAR(100),
+	score Integer,
+	count Integer,
+	PRIMARY KEY (userId,tech)
+);
+
 CREATE TABLE DATE_2008(
 	time DATE,
 	tech VARCHAR(50),

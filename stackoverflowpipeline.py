@@ -4,6 +4,7 @@ from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
 import psycopg2
+import MySQLdb
 import time
 
 
@@ -138,17 +139,12 @@ def writeRelationship(p):
 
 def writeNodePostgre(p):
 	# connect to postgresql
-	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
-	connecttmp = 0 
-	while (connecttmp < 10 ):
-		try:
-			conn = psycopg2.connect(postgre,connect_timeout=3)
-			break
-		except:
-			print ("connect attemp: ",connecttmp)
-			time.sleep(1)
-			connecttmp += 1
-	cur = conn.cursor()
+	mysqlconn = MySQLdb.connect(host="insightsqldb.cdq0uvoomk3h.us-east-1.rds.amazonaws.com",
+		user="sherry_jiayun", 
+		passwd="yjy05050609", 
+		port=3306,
+		db="insightmysql")  
+	cur = mysqlconn.cursor()
 	data_dict = dict()
 	data_dict[0] = list()
 	data_dict[1] = list()
@@ -165,9 +161,9 @@ def writeNodePostgre(p):
 	data_str_update = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[1])
 	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode,weight,count) WHERE c.technode = d.technode;"
 	cur.execute(sql_update)
-	conn.commit()
+	mysqlconn.commit()
 	cur.close()
-	conn.close()
+	mysqlconn.close()
 
 
 def writeRelationshipPostgre(p):
