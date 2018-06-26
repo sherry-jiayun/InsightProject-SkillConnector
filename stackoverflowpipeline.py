@@ -3,8 +3,9 @@ from pyspark.sql import SQLContext
 from pyspark import SparkContext,SparkConf
 from neo4j.v1 import GraphDatabase
 from pyspark.sql.functions import *
-import psycopg2
-import MySQLdb
+# import mysql.connector
+from mysql.connector import (connection)
+from datetime import date
 import time
 
 
@@ -137,14 +138,13 @@ def writeRelationship(p):
 			time.sleep(1)
 	session.close()
 
-def writeNodePostgre(p):
+def writeNodeMysql(p):
 	# connect to postgresql
-	mysqlconn = MySQLdb.connect(host="insightsqldb.cdq0uvoomk3h.us-east-1.rds.amazonaws.com",
-		user="sherry_jiayun", 
-		passwd="yjy05050609", 
-		port=3306,
-		db="insightmysql")  
-	cur = mysqlconn.cursor()
+	cnx = connection.MySQLConnection(user='sherry_jiayun', password='yjy05050609',
+		host='insightsqldb.cdq0uvoomk3h.us-east-1.rds.amazonaws.com',
+		port = 3306,
+		database='insightmysql')
+	cur = cnx.cursor()
 	data_dict = dict()
 	data_dict[0] = list()
 	data_dict[1] = list()
@@ -154,91 +154,54 @@ def writeNodePostgre(p):
 		data_dict[0].append(data_tmp_1)
 		data_dict[1].append(data_tmp_2)
 	db = "TECH_NODE"
-	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[0])
-	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (technode) DO NOTHING;"
-	cur.execute(sql_insert)
-	conn.commit()
-	data_str_update = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[1])
-	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode,weight,count) WHERE c.technode = d.technode;"
-	cur.execute(sql_update)
-	mysqlconn.commit()
-	cur.close()
-	mysqlconn.close()
+	# data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[0])
+	sql_insert = "INSERT INTO " + db + " VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE weight = VALUES(weight) + weight, count = VALUES(count) + count;"
+	cur.executemany(sql_insert,data_dict[1])
+	cnx.commit()
+	cnx.close()
 
 
-def writeRelationshipPostgre(p):
+def writeRelationshipMysql(p):
 	# connect to postgresql
-	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
-	connecttmp = 0 # try 10 times
-	while (connecttmp < 10 ):
-		try:
-			conn = psycopg2.connect(postgre,connect_timeout=3)
-			break
-		except:
-			print ("connect attemp: ",connecttmp)
-			time.sleep(1)
-			connecttmp += 1
-	cur = conn.cursor()
-	data_dict = dict()
-	data_dict[0] = list()
-	data_dict[1] = list()
+	cnx = connection.MySQLConnection(user='sherry_jiayun', password='yjy05050609',
+		host='insightsqldb.cdq0uvoomk3h.us-east-1.rds.amazonaws.com',
+		port = 3306,
+		database='insightmysql')
+	db = "TECH_REL"
+	cur = cnx.cursor()
+	data_dict = list()
 	for x in p:
 		[xx,xxx] = removeKeyForRelationship(x[0])
-		data_tmp_1 = (xx,xxx,0,0)
-		data_tmp_2 = (xx,xxx,x[1][0],x[1][1])
-		data_dict[0].append(data_tmp_1)
-		data_dict[1].append(data_tmp_2)
-	db = "TECH_REL"
-	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s,%s)",x) for x in data_dict[0])
-	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (technode1,technode2) DO NOTHING;"
-	cur.execute(sql_insert)
-	conn.commit()
-	data_str_update = ','.join(cur.mogrify("(%s,%s,%s,%s)",x) for x in data_dict[1])
-	sql_update = "UPDATE " + db + " AS d SET weight = c.weight + d.weight, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(technode1,technode2,weight,count) WHERE c.technode1 = d.technode1 and c.technode2 = d.technode2;"
-	cur.execute(sql_update)
-	conn.commit()
-	cur.close()
-	conn.close()
+		data_tmp_1 = (xx,xxx,x[1][0],x[1][1])
+		data_dict.append(data_tmp_1)
+	sql_insert = "INSERT INTO " + db + " VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE weight = VALUES(weight) + weight, count = VALUES(count) + count;"
+	cur.executemany(sql_insert,data_dict)
+	cnx.commit()
+	cnx.close()
 
 def writeDate(p):
 	# connect to postgresql
-	postgre = "dbname=InsightDB user=sherry_jiayun password=yjy05050609 host=time-key-db.cdq0uvoomk3h.us-east-1.rds.amazonaws.com"
-	connecttmp = 0 # try 10 times
-	while (connecttmp < 10 ):
-		try:
-			conn = psycopg2.connect(postgre,connect_timeout=3)
-			break
-		except:
-			print ("connect attemp: ",connecttmp)
-			time.sleep(1)
-			connecttmp += 1
-	cur = conn.cursor()
+	cnx = connection.MySQLConnection(user='sherry_jiayun', password='yjy05050609',
+		host='insightsqldb.cdq0uvoomk3h.us-east-1.rds.amazonaws.com',
+		port = 3306,
+		database='insightmysql')
+	cur = cnx.cursor()
 	data_dict = dict()
 	for x in p:
 		if len(x) != 2 or len(x[0]) != 2:
 			pass
 		else:
-			data_tmp_1 = (x[0][1],x[0][0],x[1]) # time, tech, appNum for update
-			data_tmp_2 = (x[0][1],x[0][0],0) # time, tech 0 for insert
+			data_tmp_1 = (x[0][1],x[0][0],x[1]) # time, tech, appNum for update 
 			# decide database 
 			data_base = x[0][1].split('-')[0]
 			if "DATE_"+data_base not in data_dict.keys():
-				data_dict["DATE_"+data_base] = dict()
-				data_dict["DATE_"+data_base][0] = list()
-				data_dict["DATE_"+data_base][1] = list()
-			data_dict["DATE_"+data_base][0].append(data_tmp_2)
-			data_dict['DATE_'+data_base][1].append(data_tmp_1)
+				data_dict["DATE_"+data_base] = list()
+			data_dict['DATE_'+data_base].append(data_tmp_1)
 	for db in data_dict.keys():
-		data_str_insert = ','.join(cur.mogrify("(%s,%s,%s)",x) for x in data_dict[db][0])
-		sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (time,tech) DO NOTHING;"
-		cur.execute(sql_insert)
-		conn.commit()
-		data_str_update = ','.join(cur.mogrify("(date%s,%s,%s)",x) for x in data_dict[db][1])
-		sql_update = "UPDATE " + db + " AS d SET appNum = c.appNum + d.appNum FROM (VALUES "+data_str_update+" ) as c(time, tech, appNum) WHERE c.time = d.time and c.tech = d.tech;"
-		cur.execute(sql_update)
-		conn.commit()
-	cur.close()
-	conn.close()
+		sql_insert = "INSERT INTO " + db + " VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE appNum = VALUES(appNum) + appNum;"
+		cur.executemany(sql_insert, data_dict[db])
+		cnx.commit()
+	cnx.close()
 
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
@@ -296,9 +259,9 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_date_cal = rdd_date_key.map(lambda x: (removeKeyForDate(x[0]),x[1]))
 	rdd_date_cal.foreachPartition(writeDate)
 	# write to database for node
-	rdd_node_cal.foreachPartition(writeNodePostgre)
+	rdd_node_cal.foreachPartition(writeNodeMysql)
 	# write to database for relationship
-	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
+	rdd_rel_count.foreachPartition(writeRelationshipMysql)
 	count += 1
 	if count > 10:
 		break
