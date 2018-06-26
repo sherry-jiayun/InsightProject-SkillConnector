@@ -23,9 +23,7 @@ df_MAX = sqlContext.read.format("jdbc").options(
 	password = "yjy05050609").load()
 MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
-
-# only test first 1/3 
-MAX_VALUE = MAX_VALUE / 3
+ 
 print(MAX_VALUE)
 
 # help test function
@@ -246,12 +244,8 @@ def writeDate(p):
 
 # CURRENT_VALUE_UPPER = MAX_VALUE
 # CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER - 50000
-count = 0 
 while (CURRENT_VALUE_LOW < MAX_VALUE):
 	# get null null tags from mysql db
-	# print (CURRENT_VALUE_LOW,CURRENT_VALUE_UPPER)
-	# CURRENT_VALUE_LOW = 3000000
-	# CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + 100000
 	df1 = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	 	driver = "com.mysql.jdbc.Driver",
@@ -303,8 +297,5 @@ while (CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_node_cal.foreachPartition(writeNodePostgre)
 	# write to database for relationship
 	rdd_rel_count.foreachPartition(writeRelationshipPostgre)
-	count += 1
-	if count > 10:
-		break
 sc.stop()
 # time.sleep(10)
