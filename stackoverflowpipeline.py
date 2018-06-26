@@ -24,7 +24,7 @@ df_MAX = sqlContext.read.format("jdbc").options(
 MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
  
-print(MAX_VALUE)
+print("max-value:",MAX_VALUE)
 
 # help test function
 def testFunc(p):
