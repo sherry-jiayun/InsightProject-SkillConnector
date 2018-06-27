@@ -53,6 +53,9 @@ def writeUser(p):
 	cur.close()
 	conn.close()
 
+sc = SparkContext(master="spark://10.0.0.7:7077")
+sqlContext = SQLContext(sc)
+
 num_of_row = 300000
 CURRENT_VALUE_LOW = 0
 CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
