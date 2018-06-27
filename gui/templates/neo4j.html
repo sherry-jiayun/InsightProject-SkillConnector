@@ -1,0 +1,31 @@
+<html>
+<head>
+  <link rel="stylesheet" href="../static/css/vendor.css"/>
+  <link rel="stylesheet" href="../static/css/alchemy.css"/>
+</head>
+<body>
+  <div class="alchemy" id="alchemy"></div>
+{{ data|safe }}
+
+  <script src="../static/scripts/vendor.js"></script>
+  <script src="../static/scripts/alchemy.js"></script>
+  <script type="text/javascript">
+    // var d ={"nodes": [{"id": "44561", "label": "vertex", "name": "labview", "count": 76, "weight": 420}, {"id": "59630", "label": "vertex", "name": "delaunay", "count": 14, "weight": 94}], "edges": [{"source": "59630", "target": "44561", "name": "delaunay-labview", "count": 1, "weight": 4}]}
+
+    var d = {{ data|safe }}
+    //var d= {"nodes":[{"id": 1,"betweeness": 20},{"id": 2,"betweeness": 30}]}
+    var config = {
+      dataSource: d,
+      forceLocked: false,
+      graphHeight: function(){ return 260; },
+      graphWidth: function(){ return 300; },
+      linkDistance: function(){ return 40; },
+
+      nodeTypes: {"node_type": ["vertex"]},
+      caption: function(node){ return node.caption; }
+    };
+
+    alchemy = new Alchemy(config)
+  </script>
+</body>
+</html>
