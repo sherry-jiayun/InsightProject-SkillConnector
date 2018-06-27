@@ -8,7 +8,8 @@ import time
 
 from pyspark.sql.functions import col
 
-
+sc = SparkContext(master="spark://10.0.0.7:7077")
+sqlContext = SQLContext(sc)
 # read and combine 
 
 def innerrdd(x):
