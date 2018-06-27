@@ -54,7 +54,7 @@ def writeUser(p):
 	conn.close()
 
 num_of_row = 200000
-CURRENT_VALUE_LOW = num_of_row * 3 * 10
+CURRENT_VALUE_LOW = 0
 CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
 	url = "jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
