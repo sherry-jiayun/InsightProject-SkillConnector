@@ -48,7 +48,7 @@ def index():
 @app.route("/neo4j/")
 def getNeo4jJson():
 	gdb = GraphDatabase(uri, username=username,password=password)
-	query = "MATCH p=(v1:vertex {name:'python'})-[r:Group]-() WHERE r.weight > 1000 RETURN r LIMIT 25"
+	query = "MATCH p=(v1:vertex {name:'django'})-[r:Group]-() WHERE r.weight > 1000 RETURN r LIMIT 25"
 	results = gdb.query(query,data_contents=True)
 	graph_result = results.graph
 	graph_result = reorganize(graph_result)

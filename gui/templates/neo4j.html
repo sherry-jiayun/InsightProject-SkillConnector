@@ -23,7 +23,7 @@
     .edge {
           stroke-linecap: round;
           stroke: lightblue;
-          stroke-opacity: 0.4;
+          stroke-opacity: 0.9;
           stroke-width: 2;
     }
     .edge.NOMINATED {
@@ -37,8 +37,13 @@
   </style>
 </head>
 <body>
-  <div class="alchemy" id="alchemy"></div>
+  <h1> Hello Here </h1>
+  <div style="width: 100%; border: 1px solid; height: 30%; margin-bottom: 20px;">
+    <input type="button" name="neo4jbtn" value="Click!" style="border: none; width: 50px; height: 20px; ">
+  </div>
+  <div class="alchemy" id="alchemy" ></div> 
 
+  <div style="display: inline-block;"> Test Here</div>
   <script src="../static/scripts/vendor.js"></script>
   <script src="../static/scripts/alchemy.js"></script>
   <script type="text/javascript">
@@ -51,7 +56,9 @@
       forceLocked: false,
       showControlDash: true,
       zoomControls: true,
-      linkDistance: function(){ return 40; },
+      graphHeight: function(){ var height = $(window).height() * 0.7; return height;},
+      graphWidth: function(){ var width = $(window).width(); return width;},
+      linkDistance: function(){ return 30; },
 
       nodeTypes: {"node_type": ["vertex"]},
       caption: function(node){ return node.caption; },

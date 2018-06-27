@@ -56,7 +56,7 @@ def writeUser(p):
 sc = SparkContext(master="spark://10.0.0.7:7077")
 sqlContext = SQLContext(sc)
 
-num_of_row = 200000
+num_of_row = 100000
 CURRENT_VALUE_LOW = 0
 CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
