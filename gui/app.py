@@ -3,6 +3,8 @@ from flask import render_template
 from neo4jrestclient.client import GraphDatabase
 import json
 
+from flask import request
+
 app = Flask(__name__)
 
 # neo4j param
@@ -55,6 +57,11 @@ def getNeo4jJson():
 	js_result = str(graph_result)
 	# return js_result
 	return render_template("neo4j.html",data = js_result)
+
+@app.route("/btn")
+def testBtn():
+	test = request.args.get('testinput')
+	return test
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000,debug=True)

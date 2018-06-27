@@ -39,7 +39,10 @@
 <body>
   <h1> Hello Here </h1>
   <div style="width: 100%; border: 1px solid; height: 30%; margin-bottom: 20px;">
-    <input type="button" name="neo4jbtn" value="Click!" style="border: none; width: 50px; height: 20px; ">
+    <form action="/btn" method="GET">
+      <input type="hidden" name="testinput" value="Hello~">
+      <input type="submit" name="neo4jbtn" value="Click!" style="border: none; width: 50px; height: 20px; ">
+    </form>
   </div>
   <div class="alchemy" id="alchemy" ></div> 
 
