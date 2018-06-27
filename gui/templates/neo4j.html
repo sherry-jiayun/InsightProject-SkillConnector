@@ -39,14 +39,22 @@
 <body>
   <h1> Hello Here </h1>
   <div style="width: 100%; border: 1px solid; height: 30%; margin-bottom: 20px;">
+    <div>
     <form action="/btn" method="GET">
-      <input type="hidden" name="testinput" value="Hello~">
+      <input type="text" name="node" style="border:1px solid blue;" placeholder="Which technology are you looking for?" >
       <input type="submit" name="neo4jbtn" value="Click!" style="border: none; width: 50px; height: 20px; ">
+      <br>
+      <input type="hidden" name="testinput" value="Hello~">
+      <input type="text" name="node1" style=""> and <input type="text" name="node2">
+      <input type="submit" name="neo4jbtn2" value="Do they connect?!" style="border: none; width: 150px; height: 20px; ">
     </form>
+    </div>
   </div>
   <div class="alchemy" id="alchemy" ></div> 
-
-  <div style="display: inline-block;"> Test Here</div>
+  <div style="display: inline-block;"> 
+    Test Here <br>
+     {{ r|safe }}
+  </div>
   <script src="../static/scripts/vendor.js"></script>
   <script src="../static/scripts/alchemy.js"></script>
   <script type="text/javascript">

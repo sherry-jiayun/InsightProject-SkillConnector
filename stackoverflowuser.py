@@ -53,15 +53,12 @@ def writeUser(p):
 	cur.close()
 	conn.close()
 
-sc = SparkContext(master="spark://10.0.0.7:7077")
-sqlContext = SQLContext(sc)
-
-num_of_row = 100000
-CURRENT_VALUE_LOW = 0
+num_of_row = 200000
+CURRENT_VALUE_LOW = num_of_row * 3 * 10
 CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
 	url = "jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
-	driver = "com.mysql.jdbc.Driver",
+	driver = "com.mysql.cj.jdbc.Driver",
 	dbtable = "(SELECT MAX(Id) FROM Comments) tmp",
 	user = "sherry_jiayun",
 	password = "yjy05050609").load()
@@ -69,15 +66,14 @@ MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
 
 # only test first 1/3 
-print(MAX_VALUE)
-
+# MAX_VALUE = MAX_VALUE / 3
 count = 0 
 while(CURRENT_VALUE_LOW < MAX_VALUE):
 	partitionNum = 18
 	df_c = sqlContext.read.format("jdbc").options(
 	 	url="jdbc:mysql://insight-mysql.cdq0uvoomk3h.us-east-1.rds.amazonaws.com:3306/dbo",
 	 	driver = "com.mysql.cj.jdbc.Driver",
-	 	dbtable = "(SELECT Id,Score,UserId,PostId FROM Comments WHERE Id > "+str(CURRENT_VALUE_LOW)+" AND Id < " + str(CURRENT_VALUE_UPPER) +" AND UserId is not null) tmp",
+	 	dbtable = "(SELECT Id,Score,UserId,PostId FROM Comments WHERE Id > "+str(CURRENT_VALUE_LOW)+" AND Id < " + str(CURRENT_VALUE_UPPER-50000) +" AND UserId is not null) tmp",
 	 	user="sherry_jiayun",
 	 	password="yjy05050609").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
@@ -103,11 +99,18 @@ while(CURRENT_VALUE_LOW < MAX_VALUE):
 	 	password="yjy05050609").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	df_combine = df_c.alias('c').join(df_p.alias('p'),col('c.PostId') == col('p.Id')).join(df_u.alias('u'),col('c.UserId')==col('u.Id'))
 	df_combine = df_combine.where(col("Tags").isNotNull())
-	rdd = sc.parallelize(df_combine.collect(),54)
+	rdd = sc.parallelize(df_combine.collect(),72)
 	rdd_clean = rdd.map(lambda x:(x[2],x[7],x[8],x[5].replace('<',' ').replace('>',' ').replace('  ',' '),x[1]))
 	rdd_fm = rdd_clean.flatMap(lambda x: [w for w in innerrdd(x)]).map(lambda x: ((x[0],x[3]),(x[1],x[2],x[4])))
 	rdd_cal = rdd_fm.combineByKey(lambda value: ((value[0],value[1],value[2]),1),lambda x,value:((x[0][0],x[0][1],x[0][2]+value[2]),x[1]+1),lambda x,y:((x[0],x[1],x[0][2]+y[0][2]),x[1]+y[1]))
 	rdd_final = rdd_cal.map(lambda x:(x[0][0],x[1][0][0],x[1][0][1],x[0][1],x[1][0][2],x[1][1]))
 	rdd_final.foreachPartition(writeUser)
+	count += 1
+	if count > 10:
+		sc.stop()
+		sc = SparkContext(master="spark://10.0.0.7:7077")
+		sqlContext = SQLContext(sc)
+		count = 0
+		# break
 sc.stop()
 
