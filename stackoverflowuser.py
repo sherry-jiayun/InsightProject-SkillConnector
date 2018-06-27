@@ -66,7 +66,6 @@ MAX_VALUE = df_MAX.collect()
 MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
 
 # only test first 1/3 
-MAX_VALUE = MAX_VALUE / 3
 print(MAX_VALUE)
 
 count = 0 
@@ -107,8 +106,5 @@ while(CURRENT_VALUE_LOW < MAX_VALUE):
 	rdd_cal = rdd_fm.combineByKey(lambda value: ((value[0],value[1],value[2]),1),lambda x,value:((x[0][0],x[0][1],x[0][2]+value[2]),x[1]+1),lambda x,y:((x[0],x[1],x[0][2]+y[0][2]),x[1]+y[1]))
 	rdd_final = rdd_cal.map(lambda x:(x[0][0],x[1][0][0],x[1][0][1],x[0][1],x[1][0][2],x[1][1]))
 	rdd_final.foreachPartition(writeUser)
-	count += 1
-	if count > 10:
-		break
 sc.stop()
 
