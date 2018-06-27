@@ -2,10 +2,42 @@
 <head>
   <link rel="stylesheet" href="../static/css/vendor.css"/>
   <link rel="stylesheet" href="../static/css/alchemy.css"/>
+  <style type="text/css">
+    circle {
+          fill: white;
+          fill-opacity: .5;
+          stroke-width: 3;
+          stroke-opacity: 1;
+          stroke: black;
+      }
+    circle.root {
+        stroke-width: 5;
+        fill: lightblue;
+        fill-opacity: 1;
+    }
+    .selected circle{
+          fill-opacity: 1;
+          stroke-width: 4;
+          stroke: lightblue;
+    }
+    .edge {
+          stroke-linecap: round;
+          stroke: lightblue;
+          stroke-opacity: 0.4;
+          stroke-width: 2;
+    }
+    .edge.NOMINATED {
+          stroke: lightblue;
+    }
+    .edge.selected {
+          stroke: lightblue;
+          stroke-opacity: 1;
+          stroke-dasharray: none;
+    }
+  </style>
 </head>
 <body>
   <div class="alchemy" id="alchemy"></div>
-{{ data|safe }}
 
   <script src="../static/scripts/vendor.js"></script>
   <script src="../static/scripts/alchemy.js"></script>
@@ -17,12 +49,13 @@
     var config = {
       dataSource: d,
       forceLocked: false,
-      graphHeight: function(){ return 260; },
-      graphWidth: function(){ return 300; },
+      showControlDash: true,
+      zoomControls: true,
       linkDistance: function(){ return 40; },
 
       nodeTypes: {"node_type": ["vertex"]},
-      caption: function(node){ return node.caption; }
+      caption: function(node){ return node.caption; },
+      caption: function(edge){ return edge.caption; }
     };
 
     alchemy = new Alchemy(config)

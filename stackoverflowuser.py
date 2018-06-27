@@ -43,8 +43,8 @@ def writeUser(p):
 	db = "USER_TECH"
 	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s,%s,%s,%s)",x) for x in data_dict[0])
 	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (userId,tech) DO NOTHING;"
-	# cur.execute(sql_insert)
-	# conn.commit()
+	cur.execute(sql_insert)
+	conn.commit()
 	data_str_update = ','.join(cur.mogrify("(%s,%s,%s,%s)",x) for x in data_dict[1])
 	sql_update = "UPDATE " + db + " AS d SET score = c.score + d.score, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(userId,tech,score,count) WHERE c.userId = d.userId and c.tech = d.tech;"
 	# print (sql_update)

@@ -37,7 +37,7 @@ def reorganize(graph_data):
 			edgetmp['target'] = e['endNode']
 			edgetmp['name'] = e['properties']['name']
 			edgetmp['count'] = e['properties']['count']
-			edgetmp['weight'] = e['properties']['weight']
+			edgetmp['caption'] = e['properties']['weight']
 			data_after['edges'].append(edgetmp)
 	return data_after
 
@@ -48,7 +48,7 @@ def index():
 @app.route("/neo4j/")
 def getNeo4jJson():
 	gdb = GraphDatabase(uri, username=username,password=password)
-	query = "MATCH p=()-[r:Group]->() RETURN p LIMIT 25"
+	query = "MATCH p=(v1:vertex {name:'python'})-[r:Group]-() WHERE r.weight > 1000 RETURN r LIMIT 25"
 	results = gdb.query(query,data_contents=True)
 	graph_result = results.graph
 	graph_result = reorganize(graph_result)
