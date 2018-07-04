@@ -8,9 +8,9 @@ from flask import request
 app = Flask(__name__)
 
 # neo4j param
-uri = "http://ec2-35-172-240-121.compute-1.amazonaws.com:7474/"
-username = "neo4j"
-password = "yjy05050609"
+uri = "************"
+username = "******"
+password = "**********"
 
 def reorganize(graph_data,root):
 	data_after = dict()
