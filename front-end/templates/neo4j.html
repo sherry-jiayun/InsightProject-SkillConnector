@@ -1,90 +1,637 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <link rel="stylesheet" href="../static/css/vendor.css"/>
-  <link rel="stylesheet" href="../static/css/alchemy.css"/>
-  <style type="text/css">
-    circle {
-          fill: white;
-          fill-opacity: .5;
-          stroke-width: 3;
-          stroke-opacity: 1;
-          stroke: black;
-      }
-    circle.root {
-        stroke-width: 5;
-        fill: lightblue;
-        fill-opacity: 1;
-    }
-    .selected circle{
-          fill-opacity: 1;
-          stroke-width: 4;
-          stroke: lightblue;
-    }
-    .edge {
-          stroke-linecap: round;
-          stroke: lightblue;
-          stroke-opacity: 0.9;
-          stroke-width: 2;
-    }
-    .edge.NOMINATED {
-          stroke: lightblue;
-    }
-    .edge.selected {
-          stroke: lightblue;
-          stroke-opacity: 1;
-          stroke-dasharray: none;
-    }
-  </style>
+<meta charset="utf-8">
+<title>Force Layout with labels on edges</title>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<style type="text/css">
+  .header{
+    width: 90%;
+    margin-left: 5%;
+    height: 100px;
+    background: rgba(255,204,153,0.85);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.5);
+    text-align: center;
+    padding-top: 20px;
+    font-family: ComicSansMS;
+    font-size: 30px;
+  }
+  .neo4j{
+    /* Rectangle: */
+    background: rgba(216,216,216,0.4);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
+    width: 90%;
+    height: 380px;
+    margin-left: 5%; 
+    margin-top: 15px;
+  }
+  .time_period{
+    width: 90%;
+    height: 380px;
+    margin-left: 5%; 
+    margin-top: 15px;
+    background: rgba(216,216,216,0.4);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.5);
+  }
+  .user_sec{
+    width: 90%;
+    height: 380px;
+    margin-left: 5%; 
+    margin-top: 15px;
+    background: rgba(216,216,216,0.4);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.5);
+  }
+  .inner_left{
+    height: 100%;
+    width: 60%;
+    display: inline-block;
+  }
+  .inner_right{
+    display: inline-block;
+    width: 380px; 
+    height: 100%; 
+    vertical-align: top;
+    background: rgba(254,129,1,1);
+  }
+  .inner_user_right{
+    display: inline-block;
+    width: 380px; 
+    height: 100%; 
+    vertical-align: top;
+    /* Rectangle 2: */
+    background: rgba(5,39,175,0.47);
+    float: right;
+  }
+  .inner_user_top{
+    width: 100%;
+    height: 60%;
+  }
+  .inner_user_top input[type="text"]{
+      width: 60%;
+      height: 30px;
+      border: none;
+      background: transparent;
+      font-family: ComicSansMS;
+      font-size: 16px;
+      padding-left: 10px;
+      vertical-align: top;
+      /* Rectangle 3: */
+      background: #FFFFFF;
+      border: 1px solid #51096C;
+      border-radius: 51px;
+
+      margin-top: 20%;
+      margin-left: 15%;
+  }
+  .inner_user_top input[type="submit"]{
+      width: 62%;
+      height: 30px;
+      border: none;
+      background: transparent;
+      font-family: ComicSansMS;
+      font-size: 16px;
+      color: #FFFFFF;
+      padding-left: 10px;
+      vertical-align: top;
+      /* Rectangle 6: */
+      background: #0527AF;
+      border: 1px solid #FFFFFF;
+      border-radius: 51px;
+
+      margin-top: 20px;
+      margin-left: 16%;
+  }
+  .inner_user_bottom{
+    width: 100%;
+    width: 100%;
+    height: 35%;
+    margin-bottom: 0px;
+    /* Rectangle 4: */
+    background: #51096C;
+    padding-top: 5%;
+  }
+  .inner_time_left{
+    display: inline-block;
+    width: 380px; 
+    height: 100%; 
+    vertical-align: top;
+    background: rgba(142,209,207,1);
+  }
+  .inner_time_top{
+    width: 100%;
+    height: 40%;
+    background: #A0BF7C;
+    padding-top: 20px;
+  }
+  .inner_time_bottom div{
+    width: 100px;
+    display: inline-block;
+    margin-left: 7%;
+    text-align: right;
+    font-family: ComicSansMS;
+    font-size: 16px;
+  }
+  .inner_time_bottom input[type="text"]{
+    margin-left: 20px;
+    border:none;
+    background: transparent;
+    font-family: ComicSansMS;
+    font-size: 16px;
+    width: 150px;
+    /* Rectangle 3: */
+    background: #FFFFFF;
+    border: 1px solid #7ED321;
+    border-radius: 51px;
+    margin-top: 20px;
+    padding-left: 10px;
+  }
+  .inner_time_bottom input[type="submit"]{
+    margin-left: 40%;
+    margin-top: 20px;
+    border:none;
+    background: transparent;
+    font-family: ComicSansMS;
+    font-size: 16px;
+
+    width: 150px;
+    border: 1px solid #FFFFFF;
+    border-radius: 51px;
+    cursor: pointer;
+  }
+  .inner_up{
+    width: 100%;
+    height: 40%;
+  }
+  .inner_down{
+    width: 100%;
+    height: 35%;
+    margin-bottom: 0px;
+    background: rgba(248,231,28,0.81);
+    padding-top: 5%;
+  }
+  .sec1{
+    height: 30px;
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 20%;
+    background: #FFFFFF;
+    border: 1px solid #FFFFFF;
+    border-radius: 51px;
+  }
+  .sec1 form input[type="text"]{
+    width: 60%;
+    height: 30px;
+    border: none;
+    background: transparent;
+    font-family: ComicSansMS;
+    font-size: 16px;
+    padding-left: 10px;
+    vertical-align: top;
+  }
+  .sec1 form input::placeholder{
+    color: black;
+  }
+  .sec1 form input[type="submit"]{
+    width: 34%;
+    height: 30px;
+    border:none;
+    /* Rectangle 3: */
+    background: #FE8101;
+    border: 1px solid #FFFFFF;
+    border-radius: 51px;
+    vertical-align: top;
+    cursor: pointer;
+  }
+  .sec2{
+    height: 30px;
+    width: 70%;
+    margin-left: 15%;
+    margin-top: 5%;
+  }
+  .sec2 form input[type="text"]{
+    width: 30%;
+    height: 30px;
+    border: none;
+    background: transparent;
+    font-family: ComicSansMS;
+    font-size: 14px;
+    padding-left: 10px;
+    vertical-align: top;
+    /* Rectangle 3: */
+    background: #FFFFFF;
+    border: 1px solid #F8E71C;
+    border-radius: 51px;
+  }
+  .sec2 form input[type="submit"]{
+    width: 26%;
+    height: 30px;
+    border:none;
+    margin-top: 2px;
+    /* Rectangle 3: */
+    background: #FE8101;
+    border: 1px solid #FFFFFF;
+    border-radius: 51px;
+    vertical-align: top;
+    cursor: pointer;
+  }
+  .neo4j_text{
+    font-family: ComicSansMS;
+    font-size: 14px;
+    margin-left: 20%;
+  }
+  .time_text{
+    font-family: ComicSansMS;
+    font-size: 14px;
+    margin-left: 10%;
+  }
+  .user_text{
+    font-family: ComicSansMS;
+    font-size: 14px;
+    margin-left: 10%;
+    color: #FFFFFF;
+  }
+  .axis path,
+  .axis line{
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+  }
+
+  .axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+  }
+
+  .MyRect {
+    fill: #FC4A1A;
+  }
+
+  .MyText {
+    fill: white;
+    text-anchor: middle;
+    font-size: 10px;
+  }
+
+</style>
 </head>
 <body>
-  <h1> Hello Here </h1>
-  <!-- For neo4j -->
-  <div style="width: 100%; border: 1px solid; height: 40%; margin-bottom: 20px;">
-    <div style="width: 35%; height: 100%; display: inline-block; border: 1px solid blue;vertical-align: top; margin-left: 2px;padding-left: 5%">
-      <label style="margin-top: 10px;">
-        Control panel for neo4j here!
-      </label>
-      <form action="/btn" method="GET">
-        <input type="text" name="node" style="border:1px solid lightblue;" placeholder="Which technology are you looking for?" >
-        <input type="submit" name="neo4jbtn" value="Click!" style="border: none; width: 50px; height: 20px; ">
-        <br>
-        <input type="hidden" name="testinput" value="Hello~">
-        <input type="text" name="node1" style=""> and <input type="text" name="node2">
-        <input type="submit" name="neo4jbtn2" value="Do they connect?!" style="border: none; width: 150px; height: 20px; ">
+<div class="header"> 
+  <label> Skill Connector </label><br>
+  <label style="font-size: 20px;" > Insight | </label>
+  <label style="font-size: 20px;" > Jiayun (Sherry) Yu</label>
+</div>
+
+<div class="neo4j" style="">
+  <div class="inner_left">
+    <svg id="svg_neo4j" style=" display: inline-block; width: 100%; min-height: 350px; "></svg>
+  </div>
+  <div class="inner_right" style="float: right;">
+    <div class="inner_up"> 
+      <div class="sec1" >
+        <form action="/neo4j/btn1">
+          <input type="text" name="Keyword" placeholder="Type a name here!">
+          <input type="submit" name="Search" value="Search!">
+        </form>
+      </div>
+      <div class="sec2"> 
+        <form action="/neo4j/btn2">
+          <input type="text" name="node1" placeholder="1st Tech">
+          <input type="text" name="node2" placeholder="2nd Tech">
+          <input type="submit" name="Connect" value="Connect?">
+        </form>
+      </div>
+    </div>
+    <div class="inner_down"> 
+      <div class="neo4j_text" >
+        <label id = "neo4j_text"></label> <br>
+        <label id = "neo4j_rel">
+          {% if rel != "" %}
+            Relation: {{ rel.source }} <br>
+            Weight: {{ rel.weight }} <br>
+            Count: {{ rel.count }}
+          {% endif %}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="time_period" id="time_period">
+  <div class="inner_time_left">  
+    <div class="inner_time_top">
+      <div class="time_text">
+        <label id="time_text"></label>
+      </div>
+    </div>
+    <div class="inner_time_bottom"> 
+      <form action="/neo4j/timebtn">
+        <div style="margin-top: 10%;"> From: </div> <input type="text" name="time1" placeholder="YYYY/MM/DD"> <br>
+        <div> To: </div> <input type="text" name="time2" placeholder="YYYY/MM/DD"><br>
+        <input type="submit" name="timeDetect" value="Find!">
       </form>
     </div>
-    <div style="width: 60%; height: 100%; display: inline-block; margin-left: 2px; border: 1px solid lightgreen;">
-        <label style="margin-top: 10px; padding-left: 5%;"> Result for neo4j summary here! </label>
-        <br>
-        <label style="margin-top: 10px; padding-left: 5%;">{{ r|safe }}</label>
+  </div>
+  <div class="inner_left">
+     <svg id="svg_post_1" style=" display: inline-block; width: 100%; min-height: 350px; "></svg>
+  </div>
+</div>
+
+<div class="user_sec" id="user_sec">
+  <div class="inner_left">
+    <svg id="svg_user"> </svg>
+  </div>
+  <div class="inner_user_right">
+    <div class="inner_user_top">
+      <form action="/neo4j/userbtn">
+        <input type="text" name="Keyword2" placeholder="Type a tech here!"><br>
+        <input type="submit" value="Explore!">
+      </form>
+    </div>
+    <div class="inner_user_bottom">
+      <div class="user_text">
+        <label id="user_text"></label>
+      </div>
     </div>
   </div>
-  <div class="alchemy" id="alchemy" ></div> 
-  <div style="display: inline-block;"> 
-    Test Here <br>
-  </div>
-  <script src="../static/scripts/vendor.js"></script>
-  <script src="../static/scripts/alchemy.js"></script>
-  <script type="text/javascript">
-    // var d ={"nodes": [{"id": "44561", "label": "vertex", "name": "labview", "count": 76, "weight": 420}, {"id": "59630", "label": "vertex", "name": "delaunay", "count": 14, "weight": 94}], "edges": [{"source": "59630", "target": "44561", "name": "delaunay-labview", "count": 1, "weight": 4}]}
+</div>
+<script type="text/javascript">
 
+    var section = {{ sec }}
+    if (section == '1'){
+      $('html, body').animate({
+          scrollTop: $("#time_period").offset().top
+      }, 500);
+    }
+    if (section == '2'){
+       $('html, body').animate({
+          scrollTop: $("#user_sec").offset().top
+      }, 500);
+    }
+    var w = $(window).width() * 0.6;
+    var h = $(window).height() * 0.5;
+    var linkDistance=100;
+
+    var colors = d3.scale.category10();
+    
+    // d for graph
+    // dataset for time 
     var d = {{ data|safe }}
-    //var d= {"nodes":[{"id": 1,"betweeness": 20},{"id": 2,"betweeness": 30}]}
-    var config = {
-      dataSource: d,
-      forceLocked: false,
-      showControlDash: true,
-      zoomControls: true,
-      graphHeight: function(){ var height = $(window).height() * 0.7; return height;},
-      graphWidth: function(){ var width = $(window).width(); return width;},
-      linkDistance: function(){ return 30; },
+    var dataset = {{ d|safe }}
+    var data = {{ u|safe }}
+    data = data.sort(function (a, b) {
+            return d3.ascending(a.value, b.value);
+        })
+    var margin = {top: 40,right: 60,bottom: 15,left: 120};
+    var width = w - margin.left - margin.right,
+            height = h - margin.top - margin.bottom;
+    var svg3 = d3.select("#svg_user").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var x = d3.scale.linear()
+            .range([0, width])
+            .domain([0, d3.max(data, function (d) {
+                return d.value;
+            })]);
+    var y = d3.scale.ordinal()
+            .rangeRoundBands([height, 0], .1)
+            .domain(data.map(function (d) {
+                return d.name;
+            }));
+    var yAxis = d3.svg.axis()
+            .scale(y)
+            //no tick marks
+            .tickSize(0)
+            .orient("left");
+    var gy = svg3.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+    var bars = svg3.selectAll(".bar")
+            .data(data)
+            .enter()
+            .append("g")
 
-      nodeTypes: {"node_type": ["vertex"]},
-      caption: function(node){ return node.caption; },
-      caption: function(edge){ return edge.caption; }
-    };
+    bars.append("rect")
+            .attr("class", "bar")
+            .attr("y", function (d) {
+                return y(d.name);
+            })
+            .attr('fill','#F6B16F')
+            .attr("height", y.rangeBand())
+            .attr("x", 0)
+            .attr("width", function (d) {
+                return 0;
+            })
+            .on('click',function(d,i){
+              var ele = $('#user_text');
+              ele.empty();
+              ele.append("User name: "+ d.name+"<br>");
+              ele.append("Website: : "+d.url_web + "<br>");
+              ele.append("Score: "+ d.value + "<br>" );
+              ele.append("Count: "+ d.count);
+            })
+            .transition()
+            .duration(1000)
+            .attr("width", function (d, i) {
+              return x(d.value);
+            });
 
-    alchemy = new Alchemy(config)
-  </script>
+    bars.append("text")
+            .attr("class", "label")
+            //y position of the label is halfway down the bar
+            .attr("y", function (d) {
+                return y(d.name) + y.rangeBand() / 2 + 4;
+            })
+            //x position is 3 pixels to the right of the bar
+            .attr("x", function (d) {
+                return x(d.value) + 3;
+            })
+            .text(function (d) {
+                return d.value;
+            });
+
+    var width = 600;
+    var height = 400;
+    var svg2 = d3.select("#svg_post_1").attr("width", width).attr("height", height);
+    var padding = {top: 20, right: 20, bottom: 40, left: 200};
+
+    var xScale = d3.scale.ordinal()
+      .domain(d3.range(dataset.length))
+      .rangeRoundBands([0, width - padding.left - padding.right]);
+
+    var yScale = d3.scale.linear()
+      .domain([0,d3.max(dataset,function(d) {return d.value})])
+      .range([height - padding.top - padding.bottom, 0]);
+
+    var xAxis = d3.svg.axis()
+      .scale(xScale)
+      .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+      .scale(yScale)
+      .orient("left");
+
+    var rectPadding = 4;
+    /* rect */
+    var rects = svg2.selectAll(".MyRect")
+            .data(dataset)          // 绑定数据
+            .enter()                // 获取enter部分
+            .append("rect")         // 添加rect元素,使其与绑定数组的长度一致
+            .attr("fill", "#FC4A1A")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d, i){
+                return xScale(i) + rectPadding/2;
+            })
+            .attr("y", function(d){
+                return height - padding.top - padding.bottom;
+            })
+            .attr("width", xScale.rangeBand() - rectPadding)
+            .attr("height", function(d){
+                return 0;
+            })
+            .on('click',function(d,i){
+              var ele = $('#time_text');
+              ele.empty();
+              ele.append("Tech name: "+d.text + "<br>");
+              ele.append("Post number during select duration: "+d.value+"<br>");
+              ele.append("Rank: "+d.rank);
+            })
+            .transition()
+            .duration(1000)
+            .attr("y", function (d, i) {
+              return yScale(d.value);
+            })
+            .attr("height", function (d, i) {
+              return height - padding.top - padding.bottom - yScale(d.value);
+            });
+
+    var texts = svg2.selectAll(".MyText")
+      .data(dataset)
+      .enter()
+      .append("text")
+      .attr("class","MyText")
+      .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+      .attr("x", function(d,i){
+        return xScale(i) + rectPadding/2;
+      } )
+      .attr("y",function(d){
+        return yScale(d.value);
+      })
+      .attr("dx",function(){
+        return (xScale.rangeBand() - rectPadding)/2;
+      })
+      .attr("dy",function(d){
+        return 20;
+      })
+      .text(function(d){
+        return d.text;
+      });
+
+
+    svg2.append("g").attr("class", "axis")
+        .attr("transform", "translate("+ padding.left +","+ (height - padding.bottom) +")")
+        .call(xAxis);
+    svg2.append("g")
+      .attr("class","axis")
+      .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+      .call(yAxis);
+
+
+
+    var svg = d3.select("#svg_neo4j"),width = +svg.attr("width"),height = +svg.attr("height");;
+    var force = d3.layout.force()
+        .nodes(d.nodes)
+        .links(d.edges)
+        .size([w,h])
+        .linkDistance([linkDistance])
+        .charge([-500])
+        .theta(0.1)
+        .gravity(0.05)
+        .start();
+
+    var edges = svg.selectAll("line")
+      .data(d.edges)
+      .enter()
+      .append("line")
+      .attr("id",function(d,i) {return 'edge'+i})
+      .attr('marker-end','url(#arrowhead)')
+      .style("stroke","#000")
+      .style("pointer-events", "none")
+      .on('click',function(d,i){
+        alert(d.name);
+      });
+    
+    var nodes = svg.selectAll("circle")
+      .data(d.nodes)
+      .enter()
+      .append("circle")
+      .attr({"r":15})
+      .style("fill",function(d,i){return "594AC8";})
+      .call(force.drag)
+      .on('click',function(d,i){
+        var ele = $('#neo4j_text');
+        ele.empty();
+        ele.append("Tech Name: "+ d.name+"<br>");
+        ele.append("Weight: "+d.weight + "<br>");
+        ele.append("Count: "+d.count);
+      });
+
+    var nodelabels = svg.selectAll(".nodelabel") 
+       .data(d.nodes)
+       .enter()
+       .append("text")
+       .attr({"x":function(d){return d.x;},
+              "y":function(d){return d.y;},
+              "class":"nodelabel",
+              "stroke":"black",
+              "font-size":10})
+       .text(function(d){return d.name;});
+
+    var edgepaths = svg.selectAll(".edgepath")
+        .data(d.edges)
+        .enter()
+        .append('path')
+        .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+               'class':'edgepath',
+               'fill-opacity':0,
+               'stroke-opacity':0,
+               'fill':'blue',
+               'stroke':'red',
+               'id':function(d,i) {return 'edgepath'+i}})
+        .style("pointer-events", "none");
+
+
+    svg.append('defs').append('marker')
+        .attr({'id':'arrowhead',
+               'viewBox':'-0 -5 10 10',
+               'refX':25,
+               'refY':0,
+               //'markerUnits':'strokeWidth',
+               'orient':'auto',
+               'markerWidth':10,
+               'markerHeight':10,
+               'xoverflow':'visible'})
+        .append('svg:path')
+            .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+            .attr('fill', '#000')
+            .attr('stroke','#000');
+
+    force.on("tick", function(){
+        edges.attr({"x1": function(d){return d.source.x;},
+                    "y1": function(d){return d.source.y;},
+                    "x2": function(d){return d.target.x;},
+                    "y2": function(d){return d.target.y;}
+        });
+        nodes.attr({"cx":function(d){return d.x;},
+                    "cy":function(d){return d.y;}
+        });
+        nodelabels.attr("x", function(d) { return d.x; }) 
+                  .attr("y", function(d) { return d.y; });
+        edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                           //console.log(d)
+                                           return path});       
+    });
+
+
+</script>
+
 </body>
 </html>

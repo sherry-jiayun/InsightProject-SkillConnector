@@ -8,9 +8,11 @@ import time
 
 from pyspark.sql.functions import col
 
-sc = SparkContext(master="spark://xxxxxxxxxxx")
+sc = SparkContext(master="master ip")
 sqlContext = SQLContext(sc)
 # read and combine 
+
+url = 'xxxxxxxxxx'
 
 def innerrdd(x):
 	vertex_list = x[3].strip().split(' ')
@@ -22,7 +24,7 @@ def innerrdd(x):
 
 def writeUser(p):
 	# connect to postgresql
-	postgre = "dbname=InsightDB user=xxxxxxxxxxx password=xxxxxxxxxxx host=xxxxxxxxxxx"
+	postgre = "xxxxxxxxxx"
 	connecttmp = 0 # try 10 times
 	while (connecttmp < 10 ):
 		try:
@@ -43,11 +45,11 @@ def writeUser(p):
 		data_dict[1].append(data_tmp_2)
 	db = "USER_TECH"
 	data_str_insert = ','.join(cur.mogrify("(%s,%s,%s,%s,%s,%s)",x) for x in data_dict[0])
-	sql_insert = "INSERT INTO " + db + " VALUEs "+data_str_insert +" ON CONFLICT (userId,tech) DO NOTHING;"
+	sql_insert = "INSERT INTO insight." + db + " VALUEs "+data_str_insert +" ON CONFLICT (userId,tech) DO NOTHING;"
 	cur.execute(sql_insert)
 	conn.commit()
 	data_str_update = ','.join(cur.mogrify("(%s,%s,%s,%s)",x) for x in data_dict[1])
-	sql_update = "UPDATE " + db + " AS d SET score = c.score + d.score, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(userId,tech,score,count) WHERE c.userId = d.userId and c.tech = d.tech;"
+	sql_update = "UPDATE insight." + db + " AS d SET score = c.score + d.score, count = c.count + d.count FROM (VALUES "+data_str_update+" ) as c(userId,tech,score,count) WHERE c.userId = d.userId and c.tech = d.tech;"
 	# print (sql_update)
 	cur.execute(sql_update)
 	conn.commit()
@@ -58,25 +60,23 @@ num_of_row = 200000
 CURRENT_VALUE_LOW = 0
 CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row # 50000 ROWS PER LOOP
 df_MAX = sqlContext.read.format("jdbc").options(
-	url = "jdbc:mysql://xxxxxxxxxxx/dbo",
-	driver = "com.mysql.cj.jdbc.Driver",
-	dbtable = "(SELECT MAX(Id) FROM Comments) tmp",
-	user = "xxxxxxxxxxx",
-	password = "xxxxxxxxxxx").load()
+	url = url,driver = "org.postgresql.Driver",
+	dbtable = """(SELECT MAX("Id") FROM dbo."Comments") tmp""",
+	user = "xxxxxxxxxx",
+	password = "xxxxxxxxxx").load()
 MAX_VALUE = df_MAX.collect()
-MAX_VALUE = MAX_VALUE[0]['MAX(Id)'] # get max id value 
+MAX_VALUE = MAX_VALUE[0]['max'] # get max id value 
 
 # only test first 1/3 
 # MAX_VALUE = MAX_VALUE / 3
 count = 0 
+partitionNum = 18
 while(CURRENT_VALUE_LOW < MAX_VALUE):
-	partitionNum = 18
 	df_c = sqlContext.read.format("jdbc").options(
-	 	url="jdbc:mysql://xxxxxxxxxxx:3306/dbo",
-	 	driver = "com.mysql.cj.jdbc.Driver",
-	 	dbtable = "(SELECT Id,Score,UserId,PostId FROM Comments WHERE Id > "+str(CURRENT_VALUE_LOW)+" AND Id < " + str(CURRENT_VALUE_UPPER-50000) +" AND UserId is not null) tmp",
-	 	user="xxxxxxxxxxx",
-	 	password="xxxxxxxxxxx").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
+	 	url = url,driver = "org.postgresql.Driver",
+	 	dbtable = """(SELECT "Id","Score","UserId","PostId" FROM dbo."Comments" WHERE "Id" > """+str(CURRENT_VALUE_LOW)+""" AND "Id" < """ + str(CURRENT_VALUE_UPPER) +""" AND "UserId" is not null) tmp""",
+	 	user="xxxxxxxxxx",
+	 	password="xxxxxxxxxx").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	CURRENT_VALUE_LOW = CURRENT_VALUE_UPPER
 	CURRENT_VALUE_UPPER = CURRENT_VALUE_LOW + num_of_row
 	df_c = df_c.where(col("UserId").isNotNull())
@@ -84,20 +84,18 @@ while(CURRENT_VALUE_LOW < MAX_VALUE):
 	postIdStr = ','.join(post_id)
 	postIdStr = '('+postIdStr+')'
 	df_p = sqlContext.read.format("jdbc").options(
-	 	url="jdbc:mysql://xxxxxxxxxxx:3306/dbo",
-	 	driver = "com.mysql.cj.jdbc.Driver",
-	 	dbtable = "(SELECT Id,Tags FROM Posts WHERE Id IN "+ postIdStr +") tmp",
-	 	user="xxxxxxxxxxx",
-	 	password="xxxxxxxxxxx9").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
+	 	url = url,driver = "org.postgresql.Driver",
+	 	dbtable = """(SELECT "Id","Tags" FROM dbo."Posts" WHERE "Id" IN """+ postIdStr +""") tmp""",
+	 	user="xxxxxxxxxx",
+	 	password="xxxxxxxxxx").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	user_id = df_c.select('UserId').rdd.map(lambda x: str(x.UserId)).collect()
 	userIdStr = ','.join(user_id)
 	userIdStr = '('+userIdStr+')'
 	df_u = sqlContext.read.format("jdbc").options(
-	 	url="jdbc:mysql://xxxxxxxxxxx:3306/dbo",
-	 	driver = "com.mysql.cj.jdbc.Driver",
-	 	dbtable = "(SELECT Id,DisplayName,WebsiteUrl FROM Users WHERE Id IN " + userIdStr + ") tmp",
-	 	user="xxxxxxxxxxx",
-	 	password="xxxxxxxxxxx").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
+	 	url = url,driver = "org.postgresql.Driver",
+	 	dbtable = """(SELECT "Id","DisplayName","WebsiteUrl" FROM dbo."Users" WHERE "Id" IN """ + userIdStr + """) tmp""",
+	 	user="xxxxxxxxxx",
+	 	password="xxxxxxxxxx").option('numPartitions',partitionNum).option('lowerBound',1).option('upperBound',20).option('partitionColumn',6).load()
 	df_combine = df_c.alias('c').join(df_p.alias('p'),col('c.PostId') == col('p.Id')).join(df_u.alias('u'),col('c.UserId')==col('u.Id'))
 	df_combine = df_combine.where(col("Tags").isNotNull())
 	rdd = sc.parallelize(df_combine.collect(),72)
@@ -109,9 +107,8 @@ while(CURRENT_VALUE_LOW < MAX_VALUE):
 	count += 1
 	if count > 10:
 		sc.stop()
-		sc = SparkContext(master="xxxxxxxxxxx")
+		sc = SparkContext(master="master ip:7077")
 		sqlContext = SQLContext(sc)
 		count = 0
-		# break
 sc.stop()
 

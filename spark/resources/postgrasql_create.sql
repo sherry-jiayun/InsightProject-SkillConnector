@@ -11,14 +11,14 @@ CREATE DATABASE "InsightDB"
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1;
 
-CREATE TABLE TECH_NODE(
+CREATE TABLE insight.TECH_NODE(
 	technode VARCHAR(50),
 	weight Integer,
 	count Integer,
 	PRIMARY KEY (technode)
 );
 
-CREATE TABLE TECH_REL(
+CREATE TABLE insight.TECH_REL(
 	technode1 VARCHAR(50),
 	technode2 VARCHAR(50),
 	weight Integer,
@@ -26,7 +26,7 @@ CREATE TABLE TECH_REL(
 	PRIMARY KEY (technode1,technode2)
 );
 
-CREATE TABLE USER_TECH(
+CREATE TABLE insight.USER_TECH(
 	userId Integer,
 	userName VARCHAR(100),
 	userWebSite VARCHAR(100),
@@ -36,77 +36,77 @@ CREATE TABLE USER_TECH(
 	PRIMARY KEY (userId,tech)
 );
 
-CREATE TABLE DATE_2008(
+CREATE TABLE insight.DATE_2008(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2009(
+CREATE TABLE insight.DATE_2009(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2010(
+CREATE TABLE insight.DATE_2010(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2011(
+CREATE TABLE insight.DATE_2011(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2012(
+CREATE TABLE insight.DATE_2012(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2013(
+CREATE TABLE insight.DATE_2013(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2014(
+CREATE TABLE insight.DATE_2014(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2015(
+CREATE TABLE insight.DATE_2015(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2016(
+CREATE TABLE insight.DATE_2016(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2017(
+CREATE TABLE insight.DATE_2017(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
 	PRIMARY KEY (time, tech)
 );
 
-CREATE TABLE DATE_2018(
+CREATE TABLE insight.DATE_2018(
 	time DATE,
 	tech VARCHAR(50),
 	appNum Integer,
