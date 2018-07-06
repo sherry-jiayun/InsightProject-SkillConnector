@@ -33,7 +33,6 @@
         shape-rendering: crispEdges;
       }
       .axis text{
-        stroke: #fff;
         fill: #fff;
       }
 
@@ -72,36 +71,23 @@
           <div class="col-xs-12 custom-918-col-sm-2" color: white;"> <div id='pre' style="text-align: center; font-size: 100px; padding-top: 100px; min-height: 400px;"><img src="../static/css/images/next.png" width="20%;" style="transform:rotate(180deg); cursor: pointer;" onclick="previous();"> </div>  </div>
           <div class="sec1">
             <div>
-              <div class="col-xs-2 custom-918-col-sm-8">
+              <div class="col-xs-2 custom-918-col-sm-4">
                 <svg id = "svg_summary" width = "95%" height = "400" >
               </div>
-            </div>
-            <!-- <div class="col-xs-2 custom-918-col-sm-4" style="margin-top: 20px; color: white; padding-left: 5%;">
+              <div class="col-xs-2 custom-918-col-sm-4" style="color: white; padding-left: 5%;">
                 <label>Tech1: {{ sec1['compare1'][0]['name']}}</label><br>
                 <label>Appeared: {{ sec1['compare1'][0]['count']}} times in total</label><br>
                 <label>Viewed/Response By: {{ sec1['compare1'][0]['weight']}} people</label><br>
                 <br>
-                <label>Group: {{ sec1['compare1'][1]['name']}}</label><br>
-                <label>Appeared: {{ sec1['compare1'][1]['count']}} times in total</label><br>
-                <label>Viewed/Response By: {{ sec1['compare1'][1]['weight']}} people</label><br>
-                <br>
                 <label>Tech2: {{ sec1['compare1'][2]['name']}}</label><br>
                 <label>Appeared: {{ sec1['compare1'][2]['count']}} times in total</label><br>
-                <label>Viewed/Response By: {{ sec1['compare1'][2]['weight']}} people</label>
-            </div>
-            <div class="col-xs-2 custom-918-col-sm-4" style="color: grey; margin-top: 20px;">
-                <label>Tech1: {{ sec1['compare2'][0]['name']}}</label><br>
-                <label>Appeared: {{ sec1['compare2'][0]['count']}} times in total</label><br>
-                <label>Viewed/Response By: {{ sec1['compare2'][0]['weight']}} people</label><br>
-                <br>
-                <label>Group: {{ sec1['compare2'][1]['name']}}</label><br>
-                <label>Appeared: {{ sec1['compare2'][1]['count']}} times in total</label><br>
-                <label>Viewed/Response By: {{ sec1['compare2'][1]['weight']}} people</label><br>
+                <label>Viewed/Response By: {{ sec1['compare1'][2]['weight']}} people</label><br>
                 <br>
                 <label>Tech2: {{ sec1['compare2'][2]['name']}}</label><br>
                 <label>Appeared: {{ sec1['compare2'][2]['count']}} times in total</label><br>
                 <label>Viewed/Response By: {{ sec1['compare2'][2]['weight']}} people</label>
-            </div> -->
+              </div>
+            </div>
           </div>
           <div class="sec2">
             <div class="col-xs-2 custom-918-col-sm-8">
@@ -110,46 +96,56 @@
           </div>
           <div class="sec3">
             <div class="col-xs-2 custom-918-col-sm-4" style="color: white; font-size: 12px;">
-              <label>User: {{ sec3['compare1'][0]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare1'][0]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare1'][0]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare1'][0]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare1'][1]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare1'][1]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare1'][1]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare1'][1]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare1'][2]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare1'][2]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare1'][2]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare1'][2]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare1'][3]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare1'][3]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare1'][3]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare1'][3]['weight'] }} people </label>
+              <div style="margin-left: 15%;border-radius: 10px; border:2px solid grey; padding-left: 20px; padding-top: 5px; padding-bottom: 5px; width: 80%;">
+                <label>User: {{ sec3['compare1'][0]['user_name'] }}<br>
+                Contact: {{ sec3['compare1'][0]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare1'][0]['count'] }} answers<br>
+                Upvoted By: {{ sec3['compare1'][0]['weight'] }} people </label>
+              </div>
+              <div style="margin-left: 15%; margin-top:10px;border-radius: 10px; border:2px solid grey; padding-left: 20px; padding-top: 5px; padding-bottom: 5px; width: 80%;">
+                <label>User: {{ sec3['compare1'][1]['user_name'] }}<br>
+                Contact: {{ sec3['compare1'][1]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare1'][1]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare1'][1]['weight'] }} people </label>
+              </div>
+              <div style="margin-left: 15%; margin-top:10px;border-radius: 10px; border:2px solid grey; padding-left: 20px; padding-top: 5px; padding-bottom: 5px; width: 80%;">
+                <label>User: {{ sec3['compare1'][2]['user_name'] }}<br>
+                Contact: {{ sec3['compare1'][2]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare1'][2]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare1'][2]['weight'] }} people </label>
+              </div>
+              <div style="margin-left: 15%; margin-top:10px;border-radius: 10px; border:2px solid grey; padding-left: 20px; padding-top: 5px; padding-bottom: 5px; width: 80%;">
+                <label>User: {{ sec3['compare1'][3]['user_name'] }}<br>
+                Contact: {{ sec3['compare1'][3]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare1'][3]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare1'][3]['weight'] }} people </label>
+              </div>
             </div>
             <div class="col-xs-2 custom-918-col-sm-4" style="color: grey; font-size: 12px;">
-              <label>User: {{ sec3['compare2'][0]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare2'][0]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare2'][0]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare2'][0]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare2'][1]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare2'][1]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare2'][1]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare2'][1]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare2'][2]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare2'][2]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare2'][2]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare2'][2]['weight'] }} people </label><br>
-              <br>
-              <label>User: {{ sec3['compare2'][3]['user_name'] }}</label><br>
-              <label>Contact: {{ sec3['compare2'][3]['user_web'] }}</label><br>
-              <label>Contribute To:  {{ sec3['compare2'][3]['count'] }} answers </label><br>
-              <label>Upvoted By: {{ sec3['compare2'][3]['weight'] }} people </label>
+              <div style="border-radius: 10px; border:2px solid white; padding-left: 20px; padding-top: 4px; padding-bottom: 4px; width: 80%;">
+                <label>User: {{ sec3['compare2'][0]['user_name'] }}<br>
+                Contact: {{ sec3['compare2'][0]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare2'][0]['count'] }} answers<br>
+                Upvoted By: {{ sec3['compare2'][0]['weight'] }} people </label><br>
+              </div>
+              <div style="margin-top:12px;border-radius: 10px; border:2px solid white; padding-left: 20px; padding-top: 4px; padding-bottom: 4px; width: 80%;">
+                <label>User: {{ sec3['compare2'][1]['user_name'] }}<br>
+                Contact: {{ sec3['compare2'][1]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare2'][1]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare2'][1]['weight'] }} people </label>
+              </div>
+              <div style="margin-top:12px;border-radius: 10px; border:2px solid white; padding-left: 20px; padding-top: 4px; padding-bottom: 4px; width: 80%;">
+                <label>User: {{ sec3['compare2'][2]['user_name'] }}<br>
+                Contact: {{ sec3['compare2'][2]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare2'][2]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare2'][2]['weight'] }} people </label>
+              </div>
+              <div style="margin-top:12px;border-radius: 10px; border:2px solid white; padding-left: 20px; padding-top: 4px; padding-bottom: 4px; width: 80%;">
+                <label>User: {{ sec3['compare2'][3]['user_name'] }}<br>
+                Contact: {{ sec3['compare2'][3]['user_web'] }}<br>
+                Contribute To:  {{ sec3['compare2'][3]['count'] }} answers <br>
+                Upvoted By: {{ sec3['compare2'][3]['weight'] }} people </label>
+              </div>
             </div>
           </div>
           <div class="sec4">
@@ -225,461 +221,403 @@
     }
 
     // for sec1
-    var width = $('.row1').width() /12*8
-    var height = $('#svg_sec2').height()
+    // var width = $('.row1').width() /12*4
+    // var height = $('#svg_sec2').height()
 
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = width
-    height = height - margin.top - margin.bottom;
+    function sec1_svg_cal(){
+      var width = $('.row1').width() /12*4
+      var height = $('#svg_sec2').height()
+      var margin = {top: 20, right: 40, bottom: 30, left: 40},
+        width = width - margin.left - margin.right,
+        height = height - margin.top - margin.bottom;
+      var inner_padding = 0.2
+      var outer_padding = 0.4
+      var x0 = d3.scale.ordinal()
+          .rangeRoundBands([0, width],inner_padding,outer_padding)
 
-    var x0 = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .1);
+      var x1 = d3.scale.ordinal();
 
-    var x1 = d3.scale.ordinal();
+      var y = d3.scale.linear()
+          .range([height, 0]);
 
-    var y = d3.scale.linear()
-        .range([height, 0]);
+      var xAxis = d3.svg.axis()
+          .scale(x0)
+          .tickSize(0)
+          .orient("bottom");
 
-    var xAxis = d3.svg.axis()
-        .scale(x0)
-        .tickSize(0)
-        .orient("bottom");
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left");
 
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left");
+      var color = d3.scale.ordinal()
+          .range(["#d5d5d5","#0571b0"]);
 
-    var color = d3.scale.ordinal()
-        .range(["#ca0020","#f4a582","#d5d5d5","#92c5de","#0571b0"]);
+      var svg1 = d3.select('#svg_summary')
+        .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      var data_sec1 = [{"categorie": "with reactjs", "values": [{"value": {{ sec1['compare1'][1]['weight']}}, "rate": "weight"},{"value": {{ sec1['compare1'][1]['count']}},"rate": "count"}]},{"categorie": "with angular", "values": [{"value": {{ sec1['compare2'][1]['weight']}},"rate": "weight"}, {"value": {{ sec1['compare2'][1]['count']}}, "rate": "count"}]}]
 
-    var svg1 = d3.select('#svg_summary').append("svg")
-        .attr("width", width - margin.left - margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var data = [{
-        "categorie": "Tech", 
-        "values": [
-            {
-                "value": 0, 
-                "rate": "Not at all"
-            }, 
-            {
-                "value": 4, 
-                "rate": "Not very much"
-            }, 
-            {
-                "value": 12, 
-                "rate": "Medium"
-            }, 
-            {
-                "value": 6, 
-                "rate": "Very much"
-            }, 
-            {
-                "value": 0, 
-                "rate": "Tremendously"
-            }
-        ]
-    }, 
-    {
-        "categorie": "Post Count", 
-        "values": [
-            {
-                "value": 1, 
-                "rate": "Not at all"
-            }, 
-            {
-                "value": 21, 
-                "rate": "Not very much"
-            }, 
-            {
-                "value": 13, 
-                "rate": "Medium"
-            }, 
-            {
-                "value": 18, 
-                "rate": "Very much"
-            }, 
-            {
-                "value": 6, 
-                "rate": "Tremendously"
-            }
-        ]
-    }, 
-    {
-        "categorie": "People Response", 
-        "values": [
-            {
-                "value": 3, 
-                "rate": "Not at all"
-            }, 
-            {
-                "value": 22, 
-                "rate": "Not very much"
-            }, 
-            {
-                "value": 6, 
-                "rate": "Medium"
-            }, 
-            {
-                "value": 15, 
-                "rate": "Very much"
-            }, 
-            {
-                "value": 3, 
-                "rate": "Tremendously"
-            }
-        ]
-    }]
+      var categoriesNames = data_sec1.map(function(d) { return d.categorie; });
+      var rateNames = data_sec1[0].values.map(function(d) { return d.rate; });
 
-    var categoriesNames = data.map(function(d) { return d.categorie; });
-    var rateNames = data[0].values.map(function(d) { return d.rate; });
+      x0.domain(categoriesNames);
+      x1.domain(rateNames).rangeRoundBands([0, x0.rangeBand()]);
+      y.domain([0, d3.max(data_sec1, function(categorie) { return d3.max(categorie.values, function(d) { return d.value; }); })]);
 
-    x0.domain(categoriesNames);
-    x1.domain(rateNames).rangeRoundBands([0, x0.rangeBand()]);
-    y.domain([0, d3.max(data, function(categorie) { return d3.max(categorie.values, function(d) { return d.value; }); })]);
+      svg1.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
 
-    svg1.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    svg1.append("g")
-        .attr("class", "y axis")
-        .style('opacity','0')
-        .call(yAxis)
-      .append("text")
+      svg1.append("g")
+          .attr("class", "y axis")
+          .style('opacity','0')
+          .call(yAxis)
+        .append("text")
           .attr("transform", "rotate(-90)")
           .attr("y", 6)
           .attr("dy", ".71em")
-          .style("text-anchor", "end")
+          .style("text-anchor", "middle")
           .style('font-weight','bold')
           .text("Value");
 
-    svg1.select('.y').transition().duration(500).delay(1300).style('opacity','1');
+      svg1.select('.y').transition().duration(500).delay(1300).style('opacity','1');
 
-    var slice = svg1.selectAll(".slice")
-        .data(data)
-        .enter().append("g")
-        .attr("class", "g")
-        .attr("transform",function(d) { return "translate(" + x0(d.categorie) + ",0)"; });
+      var slice = svg1.selectAll(".slice")
+          .data(data_sec1)
+          .enter().append("g")
+          .attr("class", "g")
+          .attr("transform",function(d) { return "translate(" + x0(d.categorie) + ",0)"; });
 
-    slice.selectAll("rect")
-        .data(function(d) { return d.values; })
-    .enter().append("rect")
-        .attr("width", x1.rangeBand())
-        .attr("x", function(d) { return x1(d.rate); })
-        .style("fill", function(d) { return color(d.rate) })
-        .attr("y", function(d) { return y(0); })
-        .attr("height", function(d) { return height - y(0); })
-        .on("mouseover", function(d) {
-            d3.select(this).style("fill", d3.rgb(color(d.rate)).darker(2));
-        })
-        .on("mouseout", function(d) {
-            d3.select(this).style("fill", color(d.rate));
-        });
+     slice.selectAll("rect")
+          .data(function(d) { return d.values; })
+      .enter().append("rect")
+          .attr("width", x1.rangeBand())
+          .attr("x", function(d) { return x1(d.rate); })
+          .style("fill", function(d) { return color(d.rate) })
+          .attr("y", function(d) { return y(0); })
+          .attr("height", function(d) { return height - y(0); })
+          .on("mouseover", function(d) {
+              d3.select(this).style("fill", d3.rgb(color(d.rate)).darker(2));
+          })
+          .on("mouseout", function(d) {
+              d3.select(this).style("fill", color(d.rate));
+          });
 
-    slice.selectAll("rect")
-        .transition()
-        .delay(function (d) {return Math.random()*1000;})
-        .duration(1000)
-        .attr("y", function(d) { return y(d.value); })
-        .attr("height", function(d) { return height - y(d.value); });
+      slice.selectAll("rect")
+          .transition()
+          .delay(function (d) {return Math.random()*1000;})
+          .duration(1000)
+          .attr("y", function(d) { return y(d.value); })
+          .attr("height", function(d) { return height - y(d.value); });
 
       //Legend
-    var legend = svg1.selectAll(".legend")
-        .data(data[0].values.map(function(d) { return d.rate; }).reverse())
-    .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
-        .style("opacity","0");
+      var legend = svg1.selectAll(".legend")
+          .data(data_sec1[0].values.map(function(d) { return d.rate; }).reverse())
+      .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
+          .style("opacity","0");
 
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", function(d) { return color(d); });
+      legend.append("rect")
+          .attr("x", width - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", function(d) { return color(d); });
 
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) {return d; });
+      legend.append("text")
+          .attr("x", width - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .attr("fill","white")
+          .style("text-anchor", "end")
+          .text(function(d) {return d; });
 
-    legend.transition().duration(500).delay(function(d,i){ return 1300 + 100 * i; }).style("opacity","1");
+      legend.transition().duration(500).delay(function(d,i){ return 1300 + 100 * i; }).style("opacity","1");
+    }
+    sec1_svg_cal();
 
-    windows_height = $(window).height()
-    column_height_1 = $('.row1').height()
-    column_height_2 = $('.row2').height()
-    column_height_3 = $('.row4').height()
-    $('.row3').css('height',windows_height - column_height_1 - column_height_2 - column_height_3)
+    function row_position(){
+      windows_height = $(window).height()
+      column_height_1 = $('.row1').height()
+      column_height_2 = $('.row2').height()
+      column_height_3 = $('.row4').height()
+      $('.row3').css('height',windows_height - column_height_1 - column_height_2 - column_height_3)
+    }   
+    row_position();
 
-    var sec2 = {{ sec2|safe }}
-
-    var svg;
+    function sec2_svg_cal(){
+      var sec2 = {{ sec2|safe }}
+      var svg;
   
+      var width = $('.row1').width() /12*8
+      var height = $('#svg_sec2').height()
 
-    var width = $('.row1').width() /12*8
-    var height = $('#svg_sec2').height()
+      var margin = {top: 30, right: 60, bottom: 30, left: 50},
+        width = width - margin.left - margin.right,
+        height = height - margin.top - margin.bottom;
 
-    var margin = {top: 30, right: 60, bottom: 30, left: 50},
-      width = width - margin.left - margin.right,
-      height = height - margin.top - margin.bottom;
+      var parseDate = d3.time.format("%Y-%m").parse;
+      var x = d3.time.scale().range([0, width]);
+      var y = d3.scale.linear().range([height, 0]);
 
-    var parseDate = d3.time.format("%Y-%m").parse;
-    var x = d3.time.scale().range([0, width]);
-    var y = d3.scale.linear().range([height, 0]);
+      var xAxis = d3.svg.axis().scale(x)
+          .orient("bottom").ticks(5);
+      var yAxis = d3.svg.axis().scale(y)
+          .orient("left").ticks(5);
 
-    var xAxis = d3.svg.axis().scale(x)
-        .orient("bottom").ticks(5);
-    var yAxis = d3.svg.axis().scale(y)
-        .orient("left").ticks(5);
+      var valueline = d3.svg.line()
+          .x(function(d) { return x(d.date); })
+          .y(function(d) { return y(d.tech1); });
 
-    var valueline = d3.svg.line()
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.tech1); });
+      var valueline2 = d3.svg.line()
+          .x(function(d) { return x(d.date); })
+          .y(function(d) { return y(d.tech2); });
 
-    var valueline2 = d3.svg.line()
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.tech2); });
-
-    var valueline3 = d3.svg.line()
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.tech); });
+      var valueline3 = d3.svg.line()
+          .x(function(d) { return x(d.date); })
+          .y(function(d) { return y(d.tech); });
   
-    //The SVG Container
-    var svgContainer = d3.select("#svg_sec2")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      //The SVG Container
+      var svgContainer = d3.select("#svg_sec2")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
    
+     var data = sec2
+      data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.tech = +d.tech;
+        d.tech1 = +d.tech1;
+        d.tech2 = +d.tech2;
+      });
 
-   var data = sec2
-    data.forEach(function(d) {
-      d.date = parseDate(d.date);
-      d.tech = +d.tech;
-      d.tech1 = +d.tech1;
-      d.tech2 = +d.tech2;
-    });
-
-
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return Math.max(d.tech1,d.tech2,d.tech); })]);
-
+      // Scale the range of the data
+      x.domain(d3.extent(data, function(d) { return d.date; }));
+      y.domain([0, d3.max(data, function(d) { return Math.max(d.tech1,d.tech2,d.tech); })]);
 
     // Add the valueline path.
-    svgContainer.append("path")    // Add the valueline path.
-      .attr("class", "line")
-      .attr("d", valueline(data));
+      svgContainer.append("path")    // Add the valueline path.
+        .attr("class", "line")
+        .attr("d", valueline(data));
 
-    svgContainer.append("path")    // Add the valueline path.
-      .attr("class", "line")
-      .style("stroke", "grey")
-      .attr("d", valueline2(data));
+      svgContainer.append("path")    // Add the valueline path.
+        .attr("class", "line")
+        .style("stroke", "grey")
+        .attr("d", valueline2(data));
 
-    svgContainer.append("path")    // Add the valueline path.
-      .attr("class", "line")
-      .style("stroke", "lightblue")
-      .attr("d", valueline3(data));
+      svgContainer.append("path")    // Add the valueline path.
+        .attr("class", "line")
+        .style("stroke", "lightblue")
+        .attr("d", valueline3(data));
 
-    svgContainer.append("text")
-      .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech) + ")")
-      .attr("dy", ".35em")
-      .attr("text-anchor", "start")
-      .style("fill", "lightblue")
-      .text(data[0].tech_label);
+      svgContainer.append("text")
+        .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech) + ")")
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .style("fill", "lightblue")
+        .text(data[0].tech_label);
 
-    svgContainer.append("text")
-      .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech1) + ")")
-      .attr("dy", ".35em")
-      .attr("text-anchor", "start")
-      .style("fill", "white")
-      .text(data[0].tech1_label);
+      svgContainer.append("text")
+        .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech1) + ")")
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .style("fill", "white")
+        .text(data[0].tech1_label);
 
-    svgContainer.append("text")
-      .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech2) + ")")
-      .attr("dy", ".35em")
-      .attr("text-anchor", "start")
-      .style("fill", "grey")
-      .text(data[0].tech2_label);
+      svgContainer.append("text")
+        .attr("transform", "translate(" + (width+5) + "," + y(data[data.length-1].tech2) + ")")
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .style("fill", "grey")
+        .text(data[0].tech2_label);
 
-    // Add the X Axis
-    svgContainer.append("g")     // Add the X Axis
-      .attr("class", "axis")
-      .style("stroke", "white")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      // Add the X Axis
+      svgContainer.append("g")     // Add the X Axis
+        .attr("class", "axis")
+        .style("stroke", "white")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-    // Add the Y Axis
-    svgContainer.append("g")     // Add the Y Axis
-      .attr("class", "y axis")
-      .style("stroke", "white")
-      .call(yAxis);
+      // Add the Y Axis
+      svgContainer.append("g")     // Add the Y Axis
+        .attr("class", "y axis")
+        .style("stroke", "white")
+        .call(yAxis);
 
-  var w = $(window).width() / 12 * 5;
-  var h = 400;
-  var linkDistance=70;
+      var w = $(window).width() / 12 * 5;
+      var h = 400;
+      var linkDistance=70;
 
-  var d = {{ sec4['compare1']|safe }}
-  var svg = d3.select("#svg_neo4j"),width = +svg.attr("width"),height = +svg.attr("height");
-  var force = d3.layout.force()
-        .nodes(d.nodes)
-        .links(d.edges)
-        .size([w,h])
-        .linkDistance([linkDistance])
-        .charge([-500])
-        .theta(0.1)
-        .gravity(0.05)
-        .start();
+      var d = {{ sec4['compare1']|safe }}
+      var svg = d3.select("#svg_neo4j"),width = +svg.attr("width"),height = +svg.attr("height");
+      var force = d3.layout.force()
+            .nodes(d.nodes)
+            .links(d.edges)
+            .size([w,h])
+            .linkDistance([linkDistance])
+            .charge([-500])
+            .theta(0.1)
+            .gravity(0.05)
+            .start();
 
-    var edges = svg.selectAll("line")
-      .data(d.edges)
-      .enter()
-      .append("line")
-      .attr("id",function(d,i) {return 'edge'+i})
-      .attr('marker-end','url(#arrowhead)')
-      .style("stroke","#fff")
-      .style("pointer-events", "none")
-      .on('click',function(d,i){
-        alert(d.name);
-      });
-    
-    var nodes = svg.selectAll("circle")
-      .data(d.nodes)
-      .enter()
-      .append("circle")
-      .attr({"r":15})
-      .style("fill",function(d,i){return "594AC8";})
-      .call(force.drag)
-      .on('click',function(d,i){
-        var ele = $('#text1');
-        ele.empty();
-        ele.append("Node Name: "+ d.name);
-      });
-
-    var nodelabels = svg.selectAll(".nodelabel") 
-       .data(d.nodes)
-       .enter()
-       .append("text")
-       .attr({"x":function(d){return d.x;},
-              "y":function(d){return d.y;},
-              "class":"nodelabel",
-              "stroke":"grey",
-              "font-size":12})
-       .text(function(d){return d.name;});
-
-    var edgepaths = svg.selectAll(".edgepath")
+      var edges = svg.selectAll("line")
         .data(d.edges)
         .enter()
-        .append('path')
-        .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-               'class':'edgepath',
-               'fill-opacity':0,
-               'stroke-opacity':0,
-               'fill':'blue',
-               'stroke':'red',
-               'id':function(d,i) {return 'edgepath'+i}})
-        .style("pointer-events", "none");
-
-
-    force.on("tick", function(){
-        edges.attr({"x1": function(d){return d.source.x;},
-                    "y1": function(d){return d.source.y;},
-                    "x2": function(d){return d.target.x;},
-                    "y2": function(d){return d.target.y;}
+        .append("line")
+        .attr("id",function(d,i) {return 'edge'+i})
+        .attr('marker-end','url(#arrowhead)')
+        .style("stroke","#fff")
+        .style("pointer-events", "none")
+        .on('click',function(d,i){
+          alert(d.name);
         });
-        nodes.attr({"cx":function(d){return d.x;},
-                    "cy":function(d){return d.y;}
-        });
-        nodelabels.attr("x", function(d) { return d.x; }) 
-                  .attr("y", function(d) { return d.y; });
-        edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-                                           //console.log(d)
-                                           return path});       
-    });
-
-  var d2= {{ sec4['compare2']|safe }}
-  var svg2 = d3.select("#svg_neo4j_2"),width = +svg2.attr("width"),height = +svg2.attr("height");
-  var force2 = d3.layout.force()
-        .nodes(d2.nodes)
-        .links(d2.edges)
-        .size([w,h])
-        .linkDistance([linkDistance])
-        .charge([-500])
-        .theta(0.1)
-        .gravity(0.05)
-        .start();
-
-    var edges2 = svg2.selectAll("line")
-      .data(d2.edges)
-      .enter()
-      .append("line")
-      .attr("id",function(d,i) {return 'edge'+i})
-      .attr('marker-end','url(#arrowhead)')
-      .style("stroke","#fff")
-      .style("pointer-events", "none")
-      .on('click',function(d,i){
-        alert(d.name);
-      });
     
-    var nodes2 = svg2.selectAll("circle")
-      .data(d2.nodes)
-      .enter()
-      .append("circle")
-      .attr({"r":15})
-      .style("fill",function(d,i){return "orange";})
-      .call(force2.drag)
-      .on('click',function(d,i){
-        var ele = $('#text2');
-        ele.empty();
-        ele.append("Node Name: "+ d.name);
+      var nodes = svg.selectAll("circle")
+        .data(d.nodes)
+        .enter()
+        .append("circle")
+        .attr({"r":15})
+        .style("fill",function(d,i){return "594AC8";})
+        .call(force.drag)
+        .on('click',function(d,i){
+          var ele = $('#text1');
+          ele.empty();
+          ele.append("Node Name: "+ d.name);
+        });
+
+      var nodelabels = svg.selectAll(".nodelabel") 
+         .data(d.nodes)
+         .enter()
+         .append("text")
+         .attr({"x":function(d){return d.x;},
+                "y":function(d){return d.y;},
+                "class":"nodelabel",
+                "stroke":"grey",
+                "font-size":12})
+         .text(function(d){return d.name;});
+
+      var edgepaths = svg.selectAll(".edgepath")
+          .data(d.edges)
+          .enter()
+          .append('path')
+          .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+                 'class':'edgepath',
+                 'fill-opacity':0,
+                 'stroke-opacity':0,
+                 'fill':'blue',
+                 'stroke':'red',
+                 'id':function(d,i) {return 'edgepath'+i}})
+          .style("pointer-events", "none");
+
+
+      force.on("tick", function(){
+          edges.attr({"x1": function(d){return d.source.x;},
+                      "y1": function(d){return d.source.y;},
+                      "x2": function(d){return d.target.x;},
+                      "y2": function(d){return d.target.y;}
+          });
+          nodes.attr({"cx":function(d){return d.x;},
+                      "cy":function(d){return d.y;}
+          });
+          nodelabels.attr("x", function(d) { return d.x; }) 
+                    .attr("y", function(d) { return d.y; });
+          edgepaths.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                             //console.log(d)
+                                             return path});       
       });
 
-    var nodelabels2 = svg2.selectAll(".nodelabel") 
-       .data(d2.nodes)
-       .enter()
-       .append("text")
-       .attr({"x":function(d){return d.x;},
-              "y":function(d){return d.y;},
-              "class":"nodelabel",
-              "stroke":"lightgrey",
-              "font-size":12})
-       .text(function(d){return d.name;});
+      var d2= {{ sec4['compare2']|safe }}
+      var svg2 = d3.select("#svg_neo4j_2"),width = +svg2.attr("width"),height = +svg2.attr("height");
+      var force2 = d3.layout.force()
+            .nodes(d2.nodes)
+            .links(d2.edges)
+            .size([w,h])
+            .linkDistance([linkDistance])
+            .charge([-500])
+            .theta(0.1)
+            .gravity(0.05)
+            .start();
 
-    var edgepaths2 = svg2.selectAll(".edgepath")
+      var edges2 = svg2.selectAll("line")
         .data(d2.edges)
         .enter()
-        .append('path')
-        .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
-               'class':'edgepath',
-               'fill-opacity':0,
-               'stroke-opacity':0,
-               'fill':'blue',
-               'stroke':'red',
-               'id':function(d,i) {return 'edgepath'+i}})
-        .style("pointer-events", "none");
+        .append("line")
+        .attr("id",function(d,i) {return 'edge'+i})
+        .attr('marker-end','url(#arrowhead)')
+        .style("stroke","#fff")
+        .style("pointer-events", "none")
+        .on('click',function(d,i){
+          alert(d.name);
+        });
+    
+      var nodes2 = svg2.selectAll("circle")
+        .data(d2.nodes)
+        .enter()
+        .append("circle")
+        .attr({"r":15})
+        .style("fill",function(d,i){return "orange";})
+        .call(force2.drag)
+        .on('click',function(d,i){
+          var ele = $('#text2');
+          ele.empty();
+          ele.append("Node Name: "+ d.name);
+        });
+
+      var nodelabels2 = svg2.selectAll(".nodelabel") 
+         .data(d2.nodes)
+         .enter()
+         .append("text")
+         .attr({"x":function(d){return d.x;},
+                "y":function(d){return d.y;},
+                "class":"nodelabel",
+                "stroke":"lightgrey",
+                "font-size":12})
+         .text(function(d){return d.name;});
+
+      var edgepaths2 = svg2.selectAll(".edgepath")
+          .data(d2.edges)
+          .enter()
+          .append('path')
+          .attr({'d': function(d) {return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y},
+                 'class':'edgepath',
+                 'fill-opacity':0,
+                 'stroke-opacity':0,
+                 'fill':'blue',
+                 'stroke':'red',
+                 'id':function(d,i) {return 'edgepath'+i}})
+          .style("pointer-events", "none");
 
 
-    force2.on("tick", function(){
-        edges2.attr({"x1": function(d){return d.source.x;},
-                    "y1": function(d){return d.source.y;},
-                    "x2": function(d){return d.target.x;},
-                    "y2": function(d){return d.target.y;}
-        });
-        nodes2.attr({"cx":function(d){return d.x;},
-                    "cy":function(d){return d.y;}
-        });
-        nodelabels2.attr("x", function(d) { return d.x; }) 
-                  .attr("y", function(d) { return d.y; });
-        edgepaths2.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-                                           //console.log(d)
-                                           return path});       
+      force2.on("tick", function(){
+          edges2.attr({"x1": function(d){return d.source.x;},
+                      "y1": function(d){return d.source.y;},
+                      "x2": function(d){return d.target.x;},
+                      "y2": function(d){return d.target.y;}
+          });
+          nodes2.attr({"cx":function(d){return d.x;},
+                      "cy":function(d){return d.y;}
+          });
+          nodelabels2.attr("x", function(d) { return d.x; }) 
+                    .attr("y", function(d) { return d.y; });
+          edgepaths2.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                             //console.log(d)
+                                             return path});       
+      });
+    }
+    sec2_svg_cal();
+    $( window ).resize(function() {
+      $('#svg_summary g').remove();
+      sec1_svg_cal()
+      row_position()
+      $('#svg_sec2 g').remove();
+      $('#svg_sec2 g').remove();
+      $('#svg_neo4j g').remove();
+      $('#svg_neo4j_2 g').remove();
+      sec2_svg_cal()
+      $( "#log" ).append( "<div>Handler for .resize() called.</div>" );
     });
-
   </script>
 </body>
 
