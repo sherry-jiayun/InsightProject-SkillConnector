@@ -9,7 +9,7 @@
 
 ## Pipeline
 
-![pipeline](https://github.com/sherry-jiayun/InsightProject/blob/master/pipeline.png)
+![pipeline](https://github.com/sherry-jiayun/InsightProject-SkillConnector/blob/master/pipeline.png)
 
 ## Start
 
