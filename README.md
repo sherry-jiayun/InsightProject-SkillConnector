@@ -21,4 +21,4 @@ Provide information that helps the developer to compare different technical sets
 cd ./front-end
 python app.py
 ```
-5) See command.py for spark/pyspark submit command
+5) See command.sh for spark/pyspark submit command
