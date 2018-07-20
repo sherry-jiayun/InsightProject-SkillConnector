@@ -1,11 +1,8 @@
 # InsightProject
 ## Motivation 
 
-1)Developper want to make sure they are updated.
+Provide information that helps the developer to compare different technical sets and make a decision before they start their project.
 
-2)Before starting a project, developer may want to know what technology set to choose by finding out whether this set make a good group.
-
-3)In addition, developer may also want to reach out for the expert in one specific area.
 
 ## Pipeline
 
